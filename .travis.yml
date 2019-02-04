@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+  - "lts/*"
+script:
+  - npm test
+  - npm run lint
+notifications:
+  slack:
+    rooms:
+      - yaphc-site:lxmhfC9Qxhr67tMmS8Ctf7kw#instagram-node-api
+    on_success: always
+    on_failure: always
+    template:
+      - "%{repository_slug} (%{commit}) : %{message} %{foo} "
+      - "Build details: %{build_url}"
