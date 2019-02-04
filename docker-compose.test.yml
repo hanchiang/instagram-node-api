@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+
+  node:
+    build:
+      args:
+        - NODE_ENV=test
+    environment:
+      - NODE_ENV=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=instagram_test
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=postgrestest
+    depends_on:
+      - postgrestest
+    links:
+      - postgrestest
+    healthcheck:
+      disable: true
+  
+  postgrestest:
+    image: postgres:11
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql_test:/docker-entrypoint-initdb.d
+      - ./postgresql_test/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=instagram_test
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
