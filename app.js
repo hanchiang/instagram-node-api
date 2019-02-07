@@ -10,31 +10,35 @@ const routes = require('./routes');
 const { logger } = require('./utils/logging');
 
 const app = express();
-const morganFormat = '":id" :client-ip [:date[web]] ":method :url HTTP/:http-version" :status ":referrer" ":user-agent" :response-time ms';
 
 /**
  * Middlewares
  */
+// Add id to every request via req.id
 app.use(addRequestId);
 
 // request ip can be retrieved via req.clientIp
 app.use(requestIp.mw());
 
-morgan.token('id', req => req.id);
-morgan.token('client-ip', req => req.clientIp);
-app.use(morgan(morganFormat, {
-  skip(req, res) {
-    return res.statusCode < 400;
-  },
-  stream: process.stderr
-}));
+if (process.env.NODE_ENV !== 'test') {
+  const morganFormat = '":id" :client-ip [:date[web]] ":method :url HTTP/:http-version" :status ":referrer" ":user-agent" :response-time ms';
+  morgan.token('id', req => req.id);
+  morgan.token('client-ip', req => req.clientIp);
 
-app.use(morgan(morganFormat, {
-  skip(req, res) {
-    return res.statusCode >= 400;
-  },
-  stream: process.stdout
-}));
+  app.use(morgan(morganFormat, {
+    skip(req, res) {
+      return res.statusCode < 400;
+    },
+    stream: process.stderr
+  }));
+
+  app.use(morgan(morganFormat, {
+    skip(req, res) {
+      return res.statusCode >= 400;
+    },
+    stream: process.stdout
+  }));
+}
 
 app.use(bodyParser.json());
 

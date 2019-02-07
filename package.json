@@ -4,7 +4,7 @@
   "description": "A node.js instagram API",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha 'tests/**/*.js' --timeout 5000",
+    "test": "NODE_ENV=test mocha 'tests/**/*.js' --timeout 10000",
     "test-watch": "nodemon --exec \"npm test\"",
     "lint": "./node_modules/.bin/eslint \"**/*.js\"",
     "create-table": "node ./db/scripts/create-table.js 1000",
