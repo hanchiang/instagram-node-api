@@ -12,7 +12,7 @@ describe('Queries test upsertUser', () => {
     });
   });
 
-  it('Should insert new row when there it doesn\'t exist', async () => {
+  it('Should insert new row when it doesn\'t exist', async () => {
     const result = await db.query(upsertUser(Object.values(mockUser)));
     expect(result.rowCount).to.equal(1);
   });

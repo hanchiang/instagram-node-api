@@ -20,9 +20,6 @@ exports.getUserMedia = async (req, res) => {
     res.send(`User has ${user.numPosts} posts, which is fewer than the required ${NUM_TO_CALC_AVERAGE_ENGAGEMENT} posts`);
   }
 
-  // TODO: IMPORTANT CHECK. Check whether user id exist in users table, because username
-  // can be changed but id doesn't. If yes, update username of that row
-
   const posts = await downloadPosts(user.id, user.rhxGis, user.username);
   const { averageLikes, averageComments } = calcProfileStats(posts);
 
