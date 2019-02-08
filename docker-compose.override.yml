@@ -15,8 +15,6 @@ services:
       - POSTGRES_HOST=postgres
     depends_on:
       - postgres
-    links:
-      - postgres
     healthcheck:
       disable: true
 

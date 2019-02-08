@@ -1,15 +1,55 @@
 language: node_js
+
 node_js:
-  - "lts/*"
+  - "10.15.1"
+
+services:
+  - docker
+
+env:
+  - DOCKER_COMPOSE_VERSION=1.23.2
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_116e52b77844_key -iv $encrypted_116e52b77844_iv -in postgresql_test/init-test-db.sql.enc -out postgresql_test/init-test-db.sql -d
+
+  # Install new docker version
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+
+  # Install new docker-compose version
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+  - docker --version
+  - docker-compose --version
+
+  - sudo /etc/init.d/postgresql stop
+  # wait for postgresql to shutdown
+  - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
+
+  - docker-compose build
+  - npm run compose-test-up
+  - docker container ls
+
+install: true
+
 script:
-  - npm test
-  - npm run lint
+  - docker-compose exec node npm run lint
+  - docker-compose exec node npm run test
+
+after_script:
+  - npm run compose-test-down
+
 notifications:
   slack:
     rooms:
       - yaphc-site:lxmhfC9Qxhr67tMmS8Ctf7kw#instagram-node-api
     on_success: always
     on_failure: always
-    template:
+    template: 
       - "%{repository_slug} (%{commit}) : %{message} %{foo} "
       - "Build details: %{build_url}"
