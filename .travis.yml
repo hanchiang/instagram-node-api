@@ -10,7 +10,10 @@ env:
   - DOCKER_COMPOSE_VERSION=1.23.2
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_116e52b77844_key -iv $encrypted_116e52b77844_iv -in postgresql_test/init-test-db.sql.enc -out postgresql_test/init-test-db.sql -d
+  - git clone https://github.com/hanchiang/instagram-node-api-services.git services
+  - mv services/** ..
+
+  - openssl aes-256-cbc -K $encrypted_116e52b77844_key -iv $encrypted_116e52b77844_iv -in database/postgres_test/init-user-db.sql.enc -out database/postgres_test/init-user-db.sql -d
 
   # Install new docker version
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -

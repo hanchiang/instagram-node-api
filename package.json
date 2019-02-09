@@ -4,6 +4,7 @@
   "description": "A node.js instagram API",
   "main": "index.js",
   "scripts": {
+    "dev": "./node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/www | ./node_modules/.bin/bunyan",
     "test": "NODE_ENV=test mocha 'tests/**/*.js' --timeout 10000",
     "test-watch": "nodemon --exec \"npm test\"",
     "lint": "./node_modules/.bin/eslint \"**/*.js\"",

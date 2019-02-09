@@ -2,5 +2,7 @@ node_modules
 .git
 *Dockerfile*
 *docker-compose*
+*docker.yml
 npm-debug.log
-*.txt
+user.txt
+post.txt
