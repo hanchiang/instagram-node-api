@@ -80,3 +80,4 @@ user.txt
 
 /db/scripts
 init-user-db.sql
+secrets

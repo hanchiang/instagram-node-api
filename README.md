@@ -32,3 +32,4 @@
 * [node docker setup - Digital ocean](https://www.digitalocean.com/community/tutorials/how-to-build-a-node-js-application-with-docker)
 * [Postgres health check - Peter evans](https://github.com/peter-evans/docker-compose-healthcheck)
 * [Insert multiple rows with node-postgres](https://github.com/brianc/node-postgres/issues/957)
+* [Kubernetes nginx ingress](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes)
