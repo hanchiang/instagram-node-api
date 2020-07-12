@@ -7,7 +7,7 @@ const { BASE_URL } = require('../constants');
 function httpHeaders(xInstagramGIS, username) {
   return {
     'x-instagram-gis': xInstagramGIS,
-    referer: `${BASE_URL}${username}/`,
+    referer: `${BASE_URL}/${username}/`,
   };
 }
 
