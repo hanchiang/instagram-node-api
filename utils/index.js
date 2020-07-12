@@ -1,5 +1,6 @@
 const instaUtils = require('./insta');
 const masks = require('./masks');
+const files = require('./file');
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -23,6 +24,7 @@ const parseJson = jsonString => new Promise(
 module.exports = {
   ...instaUtils,
   ...masks,
+  ...files,
   sleep,
   randomInt,
   prettyPrintJson,

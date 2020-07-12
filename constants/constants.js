@@ -11,9 +11,11 @@ const COMMON_HEADERS = {
   'x-requested-with': 'XMLHttpRequest'
 };
 
+const MOMENT_FORMAT = 'YYYYMMDD-HH:mm:ss';
+
 // URLS
-const BASE_URL = 'https://www.instagram.com/';
-const POST_URL = 'https://www.instagram.com/p/';
+const BASE_URL = 'https://www.instagram.com';
+const POST_URL = 'https://www.instagram.com/p';
 const GRAPHQL_URL = 'graphql/query/?';
 const QUERY_ID = '17888483320059182';
 
@@ -35,5 +37,6 @@ module.exports = {
   ENCODING, BASE_URL, POST_URL, GRAPHQL_URL, QUERY_ID,
   VIRAL_THRESHOLD, NUM_TO_SCRAPE, NUM_TO_CALC_AVERAGE_ENGAGEMENT, MIN_FOLLOWER, MIN_POSTS,
   PROFILE_QUERY_HASH, PROFILE_MEDIA_QUERY_HASH, PROFILE_FOLLOWERS_QUERY_HASH,
-  PROFILE_FOLLOWING_QUERY_HASH, MAX_MEDIA_PER_SCRAPE, USER_AGENT, COMMON_HEADERS
+  PROFILE_FOLLOWING_QUERY_HASH, MAX_MEDIA_PER_SCRAPE, USER_AGENT, COMMON_HEADERS,
+  MOMENT_FORMAT
 };

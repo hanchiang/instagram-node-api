@@ -81,3 +81,15 @@ user.txt
 /db/scripts
 init-user-db.sql
 secrets
+
+# input and output files from project
+commands/**/output/
+commands/**/input/
+
+# generated sample files
+image_post_sample.txt
+profile_media_sample.txt
+user_web_data_sample.txt
+video_post_sample.txt
+viral_posts_sample.txt
+user_shared_data_sample.txt
