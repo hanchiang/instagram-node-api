@@ -49,6 +49,7 @@ See [`commands/scrape`](commands/scrape/README.md)
 ## TODO
 
 - [ ] Migrate to Typescript
+- [ ] Migrate SQL code to Sequelize
 - [ ] Improve code organisation
   - [ ] Eliminate code duplication by adapting model in `commands/scrape/model.js` to `insta.js`
 - [ ] Get followers list

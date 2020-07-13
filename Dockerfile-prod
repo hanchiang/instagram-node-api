@@ -9,11 +9,8 @@ ARG PORT=3000
 ENV PORT $PORT
 EXPOSE $PORT 9229 9230
 
-# you'll likely want the latest npm, regardless of node version, for speed and fixes
-# but pin this version for the best stability
-# RUN npm i npm@latest -g
-
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+RUN apk update && apk add --no-cache bash
 
 WORKDIR /home/node/app
 

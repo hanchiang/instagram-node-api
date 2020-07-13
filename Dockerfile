@@ -9,10 +9,6 @@ ARG PORT=3000
 ENV PORT $PORT
 EXPOSE $PORT 9229 9230
 
-# you'll likely want the latest npm, regardless of node version, for speed and fixes
-# but pin this version for the best stability
-# RUN npm i npm@latest -g
-
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
 WORKDIR /home/node/app
@@ -41,4 +37,4 @@ USER node
 # so that signals are passed properly. Note the code in index.js is needed to catch Docker signals
 # using node here is still more graceful stopping then npm with --init afaik
 # I still can't come up with a good production way to run with npm and graceful shutdown
-CMD [ "node", "./bin/www" ]
+CMD [ "npm", "run", "dev" ]
