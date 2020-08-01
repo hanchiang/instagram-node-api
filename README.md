@@ -38,18 +38,10 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 - If `package-lock.json` is created as a directory instead of a file, npm throws `EISDIR: illegal operation on a directory, read`. So remove it, run `npm install` in container and verify that `package-lock.json` is correctly created as a file
 
-**bind mounting postgres volume**
-
-- `PermissionError: [Errno 13] Permission denied:` is thrown when `docker-compose build` is run. So run `sudo chown -R $USER /path/to/data` to set the correct permissions
-
-**postgres authentication error**
-
-- If encounter error: password authentication failed for user "postgres", remove the data volume on host, run `docker-compose down` and `docker-compose up`.
-
 ## TODO
 
 - [ ] Migrate to Typescript
-- [ ] Migrate SQL code to Sequelize
+- [ ] Migrate PostgreSQL to MySQL
 - [ ] Improve code organisation
   - [ ] Eliminate code duplication by adapting model in `commands/scrape/model.js` to `insta.js`
 - [ ] Get followers list
@@ -61,6 +53,4 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 - [good node docker defaults - Bret fisher](https://github.com/BretFisher/node-docker-good-defaults) from docker guru Bret Fisher
 - [node docker setup - Digital ocean](https://www.digitalocean.com/community/tutorials/how-to-build-a-node-js-application-with-docker)
-- [Postgres health check - Peter evans](https://github.com/peter-evans/docker-compose-healthcheck)
-- [Insert multiple rows with node-postgres](https://github.com/brianc/node-postgres/issues/957)
 - [Kubernetes nginx ingress](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes)
