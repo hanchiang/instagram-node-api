@@ -1,37 +1,21 @@
 /* eslint-disable prefer-destructuring */
-const { Pool } = require('pg');
+const { Sequelize } = require('sequelize');
+const cls = require('cls-hooked');
 
-// default 10 sec
-let idleTimeoutMillis = 10000;
-if (process.argv.length === 3) {
-  idleTimeoutMillis = process.argv[2];
-}
-const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT,
-  idleTimeoutMillis
+const namespace = cls.createNamespace('my-very-own-namespace');
+Sequelize.useCLS(namespace);
+
+const { initUser, User } = require('./models/user');
+const { initPost, Post } = require('./models/post');
+
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: process.env.DB_HOST,
+  dialect: 'mysql'
 });
 
-/**
- *
- * @param {object} config
- * @param {string} config.text
- * @param {Array<any>=} config.values
- * @param {string=} config.name
- * @param {string=} config.rowMode
- * @param {types=} config.types
- */
-function query(config) {
-  return pool.query(config).catch(err => { throw err; });
-}
-
-function getClient() {
-  return pool.connect().catch(err => { throw err; });
-}
+initUser(sequelize);
+initPost(sequelize);
 
 module.exports = {
-  query, getClient
+  User, Post, sequelize
 };
