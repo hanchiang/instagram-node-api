@@ -1,4 +1,4 @@
-FROM node:10.15-jessie
+FROM node:12.18-buster-slim
 
 # Override in docker-compose
 ARG NODE_ENV=development
@@ -16,7 +16,7 @@ WORKDIR /home/node/app
 COPY package.json .
 
 RUN npm install && npm cache clean --force
-# ENV PATH node_modules/.bin:$PATH
+ENV PATH node_modules/.bin:$PATH
 
 # check every 30s to ensure this service returns HTTP 200
 HEALTHCHECK --interval=30s CMD node healthcheck.js
@@ -25,9 +25,6 @@ HEALTHCHECK --interval=30s CMD node healthcheck.js
 COPY . .
 
 COPY --chown=node:node . .
-
-COPY docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["docker-entrypoint.sh"]
 
 # the official node image provides an unprivileged user as a security best practice
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md#non-root-user
