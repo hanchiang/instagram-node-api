@@ -1,0 +1,23 @@
+{
+  id: "1903857392",
+  username: "simplyfunstuff",
+  fullname: "Good Vibes Only",
+  numPosts: 3005,
+  numFollowers: 224578,
+  numFollowing: 178,
+  averageLikes: 3024.45,
+  averageComments: 63.4,
+  isPrivate: false,
+  isVerified: false,
+  profilePicUrl: "https://scontent-sin2-2.cdninstagram.com/vp/ac898273ff198e73662d3f599da59c83/5CF5CC9B/t51.2885-19/s150x150/44835962_600112727087008_2220702025669148672_n.jpg?_nc_ht=scontent-sin2-2.cdninstagram.com",
+  isBusinessAccount: true,
+  businessCategoryName: "Publishers",
+  businessEmail: "ig.simplyfunstuff@gmail.com",
+  businessPhoneNumber: "",
+  businessAddressJson: "{"street_address": "", "zip_code": "", "city_name": "", "region_name": "", "country_code": ""}",
+  rhxGis: "6c48da4f326e454f1a1107f00a38e0cf",
+  csrfToken: "wnLzRHTSRFn1CaFmgJSHExXUnvhPXC5v",
+  countryCode: "SG",
+  languageCode: "en",
+  locale: "en_US"
+}

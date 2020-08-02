@@ -52,6 +52,7 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 - [x] Migrate PostgreSQL to MySQL
 - [ ] Migrate to Typescript
+- [ ] Add types for posts and other data
 - [ ] Proper error handling
 - [ ] Update posts output format to become more human readable
   - [ ] Save posts to database?
