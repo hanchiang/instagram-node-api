@@ -14,6 +14,7 @@ const app = express();
 /**
  * Middlewares
  */
+
 // Add id to every request via req.id
 app.use(addRequestId());
 

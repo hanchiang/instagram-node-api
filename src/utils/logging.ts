@@ -1,7 +1,7 @@
 import bunyan from 'bunyan';
 const bunyanExpressSerializer = require('bunyan-express-serializer');
 
-export const logger = bunyan.createLogger({
+const logger = bunyan.createLogger({
   name: 'instagram-api',
   serializers: {
     err: bunyanExpressSerializer,
@@ -15,3 +15,5 @@ export const logger = bunyan.createLogger({
 if (process.env.NODE_ENV === 'test') {
   logger.level(bunyan.FATAL + 1);
 }
+
+export { logger };
