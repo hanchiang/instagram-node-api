@@ -12,10 +12,10 @@ exports.getUserMedia = async (req, res) => {
   let user = await retrieveUserWebInfo(profileRes);
 
   if (user.isPrivate) {
-    res.send('User is private');
+    return res.send('User is private');
   }
   if (user.numPosts < NUM_TO_CALC_AVERAGE_ENGAGEMENT) {
-    res.send(`User has ${user.numPosts} posts, which is fewer than the required ${NUM_TO_CALC_AVERAGE_ENGAGEMENT} posts`);
+    return res.send(`User has ${user.numPosts} posts, which is fewer than the required ${NUM_TO_CALC_AVERAGE_ENGAGEMENT} posts`);
   }
 
   const posts = await downloadPosts(user.id, user.rhxGis, user.username);
