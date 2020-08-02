@@ -46,6 +46,7 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [ ] Update posts output format to become more human readable
   - [ ] Save posts to database?
 - [ ] Improve code organisation
+- [ ] Add more tests
 - [ ] Feature flag to toggle saving user and posts to database
   - [ ] Eliminate code duplication by adapting model in `commands/scrape/model.js` to `insta.js`
 - [ ] Get followers list
