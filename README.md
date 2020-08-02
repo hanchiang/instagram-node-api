@@ -40,8 +40,8 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 ## TODO
 
+- [x] Migrate PostgreSQL to MySQL
 - [ ] Migrate to Typescript
-- [ ] Migrate PostgreSQL to MySQL
 - [ ] Proper error handling
 - [ ] Update posts output format to become more human readable
   - [ ] Save posts to database?
