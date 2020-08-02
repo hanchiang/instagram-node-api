@@ -76,11 +76,11 @@ app.use(helmet());
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 
 app.get('/', (req, res) => {
-  res.send('Hello Docker World\n');
+  res.send('Hello World!');
 });
 
 app.get('/healthz', (req, res) => {
-  res.status(200).send('');
+  res.status(200).send();
 });
 
 app.use(routes);
