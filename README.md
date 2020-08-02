@@ -43,6 +43,7 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [ ] Migrate to Typescript
 - [ ] Migrate PostgreSQL to MySQL
 - [ ] Improve code organisation
+- [ ] Feature flag to toggle saving user and posts to database
   - [ ] Eliminate code duplication by adapting model in `commands/scrape/model.js` to `insta.js`
 - [ ] Get followers list
   - [ ] display list of followers with more following than followers
@@ -54,3 +55,8 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [good node docker defaults - Bret fisher](https://github.com/BretFisher/node-docker-good-defaults) from docker guru Bret Fisher
 - [node docker setup - Digital ocean](https://www.digitalocean.com/community/tutorials/how-to-build-a-node-js-application-with-docker)
 - [Kubernetes nginx ingress](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes)
+- [Instagram developer changelog](https://www.instagram.com/developer/changelog/)
+
+## Disclaimer
+
+This is not affliated, endorsed or certified by Instagram. This is an independent and unofficial API. Strictly not for spam. Exercise discretion and use at your own risk.
