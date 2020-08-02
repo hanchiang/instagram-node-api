@@ -5,11 +5,7 @@
 const app = require('../app');
 require('../db');
 
-const PORT = process.env.PORT || 8080;
-// if you're not using docker-compose for local development, this will default to 8080
-// to prevent non-root permission problems with 80. Dockerfile is set to make this 80
-// because containers don't have that issue :)
-
+const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   console.log(`Webserver is ready and listening on port ${PORT}`);
 });

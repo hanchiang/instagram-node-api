@@ -16,11 +16,21 @@
 
 1. Install [git](https://git-scm.com/downloads)
 1. Install [nodejs](https://nodejs.org/en/download/)
+1. Install [MySQL](https://www.mysql.com/)
+
+### Environment variables
+
+- `DB_NAME`
+- `DB_HOST`
+- `DB_USER`
+- `DB_PASSWORD`
+- `NODE_ENV`: 'development' or 'test' or 'production'
 
 ## Usage
 
-- Install packages: `npm install`
+- Install dependencies: `npm install`
 - Start server: `npm run dev`
+- Visit server at `localhost:3000`
 
 ## Command line usage
 
