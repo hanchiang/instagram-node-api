@@ -23,5 +23,5 @@ module.exports = (err) => {
   } else {
     error = new Error(err.message);
   }
-  return err;
+  return error;
 };
