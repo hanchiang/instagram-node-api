@@ -22,6 +22,10 @@ const userSchema = {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  numFollowing: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   averageLikes: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -67,9 +71,6 @@ const userSchema = {
     allowNull: true,
     defaultValue: null,
   },
-  rhxGis: {
-    type: DataTypes.STRING,
-  },
   csrfToken: {
     type: DataTypes.STRING
   },
@@ -100,11 +101,12 @@ class User extends Model {}
 function initUser(sequelize) {
   User.init(userSchema, {
     sequelize,
-    tableName: 'user'
+    tableName: 'user',
+    underscored: true,
   });
 }
 
 module.exports = {
   initUser,
   User,
-}
+};

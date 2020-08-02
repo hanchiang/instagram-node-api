@@ -66,11 +66,12 @@ class Post extends Model {}
 function initPost(sequelize) {
   Post.init(postSchema, {
     sequelize,
-    tableName: 'post'
+    tableName: 'post',
+    underscored: true,
   });
 }
 
 module.exports = {
   initPost,
   Post
-}
+};

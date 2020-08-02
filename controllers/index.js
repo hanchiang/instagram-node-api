@@ -3,9 +3,7 @@ const {
 } = require('../lib/insta');
 
 const { NUM_TO_CALC_AVERAGE_ENGAGEMENT } = require('../constants');
-const db = require('../db');
-const queries = require('../db/queries');
-const { logger } = require('../utils/logging');
+const { upsertUser } = require('../services');
 
 exports.getUserMedia = async (req, res) => {
   const { username } = req.params;
@@ -34,13 +32,5 @@ exports.getUserMedia = async (req, res) => {
 
   res.json({ ...user, viralPosts });
 
-  const result = await db.query(queries.upsertUser([
-    user.id, user.username, user.fullname, user.numPosts, user.numFollowers,
-    user.numFollowing, user.averageLikes, user.averageComments, user.isPrivate,
-    user.isVerified, user.profilePicUrl, user.isBusinessAccount,
-    user.businessCategoryName, user.businessEmail, user.businessPhoneNumber,
-    user.businessAddressJson, user.rhxGis, user.csrfToken, user.countryCode,
-    user.languageCode, user.locale
-  ]));
-  logger.info(`Upserted ${result.rowCount} record(s)`);
+  await upsertUser(user, posts);
 };
