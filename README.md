@@ -71,6 +71,10 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [Kubernetes nginx ingress](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes)
 - [Instagram developer changelog](https://www.instagram.com/developer/changelog/)
 
+## Feedback
+
+Please leave your feedback by opening a new [issue](https://github.com/hanchiang/instagram-node-api/issues)
+
 ## Disclaimer
 
 This is not affliated, endorsed or certified by Instagram. This is an independent and unofficial API. Strictly not for spam. Exercise discretion and use at your own risk.
