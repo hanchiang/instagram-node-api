@@ -33,6 +33,7 @@ export async function readFile(filepath: string) {
     const data = await _readFile(filepath, ENCODING);
     return data.split('\n');
   } catch (err) {
+    console.log(err);
     throw new Error("Please create a file 'input.txt' in the 'input' folder");
   }
 }

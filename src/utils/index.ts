@@ -15,7 +15,7 @@ export function randomInt(min: number = 100, max: number = 1000) {
   return Math.round(Math.random() * (max - min) + min);
 }
 
-export const prettyPrintJson = (json: JSON) => JSON.stringify(json, null, 2);
+export const prettyPrintJson = (json: any) => JSON.stringify(json, null, 2);
 
 export const parseJson = (jsonString: string) =>
   new Promise((resolve) =>

@@ -1,11 +1,11 @@
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 
-const axios = require('axios');
-const htmlparser = require('htmlparser2');
+import axios from 'axios';
+import htmlparser from 'htmlparser2';
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const {
+import {
   handleCreateFolder,
   readFile,
   writeFile,
@@ -17,10 +17,10 @@ const {
   sleep,
   parseJson,
   randomInt,
-} = require('../../utils');
-const apiErrorTransform = require('../../utils/apiErrorTransform');
+} from '../../utils';
+import apiErrorTransform from '../../utils/apiErrorTransform';
 
-const {
+import {
   USER_AGENT,
   BASE_URL,
   NUM_TO_CALC_AVERAGE_ENGAGEMENT,
@@ -30,8 +30,8 @@ const {
   POST_URL,
   VIRAL_THRESHOLD,
   NUM_TO_SCRAPE,
-} = require('../../constants');
-const UserViral = require('./model');
+} from '../../constants';
+import UserViral from './model';
 
 const OUTPUT_FOLDER = 'output';
 const INPUT_FOLDER = 'input';
@@ -100,7 +100,7 @@ async function _scrapeUsers() {
       return;
     }
 
-    console.log(`id: ${userViral.userId}, rhx_gis: ${userViral.rhxGis}\n`);
+    console.log(`id: ${userViral.userId}\n`);
 
     // 3. Make graphql request to get media data of a profile and append to `posts`
     await downloadPosts();
@@ -151,14 +151,15 @@ function retrieveUserWebInfoHelper(data) {
           const regex = /window\._sharedData = (.*);/;
           const match = text.match(regex);
           if (match) {
-            const json = await parseJson(match[1]);
+            const json: any = await parseJson(match[1]);
             seenSharedData = true;
             userViral.userSharedData = json;
             userViral.userWebData = json.entry_data.ProfilePage[0].graphql.user;
 
             userViral.userId = userViral.userWebData.id;
-            userViral.numPosts =
-              userViral.userWebData.edge_owner_to_timeline_media.count;
+            (userViral.isPrivate = userViral.userWebData.is_private),
+              (userViral.numPosts =
+                userViral.userWebData.edge_owner_to_timeline_media.count);
             userViral.numFollowers =
               userViral.userWebData.edge_followed_by.count;
             userViral.numFollowing = userViral.userWebData.edge_follow.count;
@@ -221,7 +222,7 @@ async function getProfileMedia(numMedia, endCursor) {
     numMedia,
     endCursor
   );
-  const xInstagramGIS = getInstagramGISHash(userViral.rhxGis, queryVariables);
+  const xInstagramGIS = getInstagramGISHash(queryVariables);
 
   // https://www.instagram.com/graphql/query/?query_hash=${hash}&variables=${encoded JSON string variables}
   const url = `${BASE_URL}/${GRAPHQL_URL}query_hash=${PROFILE_MEDIA_QUERY_HASH}&variables=${encodeURIComponent(
@@ -320,6 +321,7 @@ function getViralContent() {
       id: post.id,
       userId: post.owner.id,
       isVideo: post.is_video,
+      videoViews: post.video_view_count,
       numComments: post.edge_media_to_comment.count,
       numLikes: post.edge_media_preview_like.count,
       url: `${POST_URL}/${post.shortcode}`,

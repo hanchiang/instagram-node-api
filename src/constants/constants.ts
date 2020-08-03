@@ -22,7 +22,7 @@ export const QUERY_ID = '17888483320059182';
 
 // App constants
 export const VIRAL_THRESHOLD = 1;
-export const NUM_TO_SCRAPE = process.env.NODE_ENV === 'test' ? 100 : 200;
+export const NUM_TO_SCRAPE = process.env.NODE_ENV === 'test' ? 100 : 500;
 export const NUM_TO_CALC_AVERAGE_ENGAGEMENT = 20;
 export const MIN_FOLLOWER = 15000;
 export const MIN_POSTS = 100;

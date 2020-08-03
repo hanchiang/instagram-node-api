@@ -42,3 +42,13 @@ yarn.lock
 
 # nyc
 .nyc_output
+
+# custom
+image_post_sample.txt
+post.txt
+profile_media_sample.txt
+user.txt
+user_shared_data_sample.txt
+user_web_data_sample.txt
+video_post_sample.txt
+viral_posts_sample.txt
