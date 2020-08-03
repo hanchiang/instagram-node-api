@@ -1,23 +1,36 @@
 {
-  "extends": "airbnb-base",
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["prettier"],
   "env": {
     "node": true,
-    "es6": true,
     "mocha": true
   },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
   "rules": {
-    "arrow-parens": 0,
-    "no-restricted-syntax": 0,
-    "no-console": 0,
-    "comma-dangle": 0,
-    "no-underscore-dangle": 0,
-    "no-await-in-loop": 0,
-    "no-plusplus": 0,
-    "func-names": 0,
-    "prefer-promise-reject-errors": 1,
-    "object-property-newline": 1,
-    "no-use-before-define": 1,
-    "max-len": 1,
-    "object-curly-newline": 1
+    "prettier/prettier": "error",
+    "semi": ["error", "always"],
+    "prefer-rest-params": 0,
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-explicit-any": 1,
+    "@typescript-eslint/no-inferrable-types": [
+      "warn",
+      {
+        "ignoreParameters": true
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/ban-ts-ignore": "warn",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/camelcase": "warn",
+    "@typescript-eslint/no-var-requires": "warn",
+    "@typescript-eslint/no-empty-function": "warn"
   }
 }
