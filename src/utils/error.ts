@@ -1,9 +1,9 @@
 import { ApiResponse } from 'apisauce';
 
-import { CustomError } from '../types/error';
+import { CustomError, ThrowError } from '../types/error';
 import { logger } from '../utils/logging';
 
-export enum ErrorCode {
+export enum ErrorStatus {
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
@@ -22,7 +22,15 @@ const statusToErrorCode = {
 export const mapStatusToErrorCode = (status: number): string =>
   statusToErrorCode[status] || statusToErrorCode[500];
 
-export const transformError = (
+export const throwError = (errObj: ThrowError): CustomError => {
+  throw {
+    message: errObj.message,
+    code: mapStatusToErrorCode(errObj.status as number),
+    status: errObj.status as number,
+  };
+};
+
+export const transformApiError = (
   err: ApiResponse<any>,
   customErrMessage?: string
 ): CustomError => {

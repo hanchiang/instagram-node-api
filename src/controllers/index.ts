@@ -7,6 +7,7 @@ import {
 } from '../lib/insta';
 
 import { User } from '../types/model';
+import { throwError, ErrorStatus } from '../utils/error';
 
 import { NUM_TO_CALC_AVERAGE_ENGAGEMENT } from '../constants';
 import { upsertUser } from '../services';
@@ -18,12 +19,16 @@ export const getUserMedia = async (req, res) => {
   let user: User = await retrieveUserWebInfo(profileRes as string);
 
   if (user.isPrivate) {
-    return res.send('User is private');
+    return throwError({
+      message: 'User is private',
+      status: ErrorStatus.BAD_REQUEST,
+    });
   }
   if (user.numPosts < NUM_TO_CALC_AVERAGE_ENGAGEMENT) {
-    return res.send(
-      `User has ${user.numPosts} posts, which is fewer than the required ${NUM_TO_CALC_AVERAGE_ENGAGEMENT} posts`
-    );
+    return throwError({
+      message: `@${user.username} has ${user.numPosts} posts, which is fewer than the required ${NUM_TO_CALC_AVERAGE_ENGAGEMENT} posts`,
+      status: ErrorStatus.BAD_REQUEST,
+    });
   }
 
   const posts = await downloadPosts(user.id, user.username);
