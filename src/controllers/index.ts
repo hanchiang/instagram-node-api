@@ -20,7 +20,7 @@ export const getUserMedia = async (req, res) => {
 
   if (user.isPrivate) {
     return throwError({
-      message: 'User is private',
+      message: `@${user.username} is private`,
       status: ErrorStatus.BAD_REQUEST,
     });
   }

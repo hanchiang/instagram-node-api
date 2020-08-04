@@ -14,7 +14,7 @@ describe('Integration tests', () => {
     it('Private user profile should return appropriate message', async () => {
       const res = await request(app).get(`/media/user/${privateUser}`);
       expect(res.status).to.equal(400);
-      expect(res.body.error.message).to.equal('User is private');
+      expect(res.body.error.message).to.includes('is private');
     });
 
     it('Invalid user should return 404', async () => {
