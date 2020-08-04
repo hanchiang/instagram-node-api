@@ -1,8 +1,8 @@
-import axios from 'axios';
+import { create } from 'apisauce';
 
 import { BASE_URL, COMMON_HEADERS } from '../constants';
 
-const Api = axios.create({
+const Api = create({
   baseURL: BASE_URL,
   timeout: 50000,
   headers: COMMON_HEADERS,

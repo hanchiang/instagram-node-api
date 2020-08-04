@@ -1,11 +1,11 @@
 import htmlparser from 'htmlparser2';
 import _ from 'lodash';
-import { AxiosResponse } from 'axios';
+import { ApiResponse } from 'apisauce';
 
 import { User } from '../types/model';
 import { ProfileStats } from '../types/model';
+import { transformError } from '../utils/error';
 import Api from '../config';
-import apiErrorTransform from '../utils/apiErrorTransform';
 
 import {
   parseJson,
@@ -33,11 +33,12 @@ import {
  * @param {object} headers
  */
 export async function fetchProfile(username: string, headers: any = {}) {
-  try {
-    const result = await Api.get(`/${username}`, { headers });
-    return result;
-  } catch (e) {
-    throw apiErrorTransform(e);
+  const result = await Api.get(`/${username}`, { headers });
+  if (result.ok) {
+    return result.data;
+  }
+  if (result.status === 404) {
+    throw transformError(result, `@${username} is not found`);
   }
 }
 
@@ -137,12 +138,11 @@ export async function getProfileMedia(
   const config = {
     headers: httpHeaders(xInstagramGIS, username),
   };
-  try {
-    const res: AxiosResponse = await Api.get(`/${url}`, config);
+  const res: ApiResponse<any> = await Api.get(`/${url}`, config);
+  if (res.ok) {
     return res.data;
-  } catch (e) {
-    throw apiErrorTransform(e);
   }
+  throw transformError(res);
 }
 
 /**

@@ -52,14 +52,14 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 - [x] Migrate PostgreSQL to MySQL
 - [x] Migrate to Typescript
-- [ ] Add types for posts and other data
 - [ ] Proper error handling
-- [ ] Update posts output format to become more human readable
-  - [ ] Save posts to database?
 - [ ] Improve code organisation
 - [ ] Add more tests
 - [ ] Eliminate code duplication by adapting model in `commands/scrape/model.ts` to `insta.ts`
-  - [ ] Standardise data retrieved in `ontext()`
+- [ ] Update posts output format to become more human readable
+- [ ] Standardise data retrieved in `ontext()`
+- [ ] Add types for posts and other data
+- [ ] Save posts to database?
 - [ ] Feature flag to toggle saving user and posts to database
 - [ ] Get followers list
   - [ ] display list of followers with more following than followers

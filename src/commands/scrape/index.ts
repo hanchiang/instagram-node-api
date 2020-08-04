@@ -18,7 +18,8 @@ import {
   parseJson,
   randomInt,
 } from '../../utils';
-import apiErrorTransform from '../../utils/apiErrorTransform';
+
+import { transformError } from '../../utils/error';
 
 import {
   USER_AGENT,
@@ -116,7 +117,7 @@ async function _scrapeUsers() {
 
     console.log(`Completed work for ${userViral.username}!`);
   } catch (err) {
-    apiErrorTransform(err);
+    throw transformError(err);
   }
 }
 

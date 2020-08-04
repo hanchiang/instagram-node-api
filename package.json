@@ -28,7 +28,7 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.1",
+    "apisauce": "^1.1.2",
     "body-parser": "^1.18.3",
     "bunyan": "^1.8.12",
     "bunyan-express-serializer": "^1.0.0",

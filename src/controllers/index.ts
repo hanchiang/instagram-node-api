@@ -14,8 +14,8 @@ import { upsertUser } from '../services';
 export const getUserMedia = async (req, res) => {
   const { username } = req.params;
 
-  const { data: profileRes } = await fetchProfile(username);
-  let user: User = await retrieveUserWebInfo(profileRes);
+  const profileRes = await fetchProfile(username);
+  let user: User = await retrieveUserWebInfo(profileRes as string);
 
   if (user.isPrivate) {
     return res.send('User is private');
@@ -38,7 +38,9 @@ export const getUserMedia = async (req, res) => {
 
   const viralPosts = posts.filter(getViralContent(averageLikes));
 
-  res.json({ ...user, viralPosts });
+  res.json({
+    payload: { ...user, viralPosts },
+  });
 
   await upsertUser(user, posts);
 };
