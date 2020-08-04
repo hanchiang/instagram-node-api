@@ -52,7 +52,7 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 - [x] Migrate PostgreSQL to MySQL
 - [x] Migrate to Typescript
-- [ x ] Proper error handling
+- [x] Proper error handling
 - [ ] Improve code organisation
 - [ ] Add more tests
 - [ ] Eliminate code duplication by adapting model in `commands/scrape/model.ts` to `insta.ts`
