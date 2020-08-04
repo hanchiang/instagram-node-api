@@ -4,7 +4,7 @@ import { ApiResponse } from 'apisauce';
 
 import { User } from '../types/model';
 import { ProfileStats } from '../types/model';
-import { transformError } from '../utils/error';
+import { transformApiError } from '../utils/error';
 import Api from '../config';
 
 import {
@@ -38,7 +38,7 @@ export async function fetchProfile(username: string, headers: any = {}) {
     return result.data;
   }
   if (result.status === 404) {
-    throw transformError(result, `@${username} is not found`);
+    throw transformApiError(result, `@${username} is not found`);
   }
 }
 
@@ -142,7 +142,7 @@ export async function getProfileMedia(
   if (res.ok) {
     return res.data;
   }
-  throw transformError(res);
+  throw transformApiError(res);
 }
 
 /**
