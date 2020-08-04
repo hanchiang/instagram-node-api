@@ -95,6 +95,6 @@ app.get('/healthz', (req, res) => {
 app.use(routes);
 
 app.use(errorHandlers.notFound);
-app.use(errorHandlers.productionErrors);
+app.use(errorHandlers.errorHandler);
 
 export default app;

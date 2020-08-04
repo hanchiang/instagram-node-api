@@ -18,20 +18,21 @@ export const notFound = (req: Request, res: Response, next: NextFunction) => {
   next(err);
 };
 
-export const productionErrors = (
+export const errorHandler = (
   err: CustomError,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const status = err.status || 500;
-  const message = err.message || 'An error ocurred';
   const error: any = {
-    message: err.message || message,
+    message: err.message || 'An error ocurred',
+    status: err.status,
+    code: err.code,
+    stack: err.stack,
   };
-  if (process.env.NODE_ENV !== 'production') {
-    error.stack = err.stack;
+  if (process.env.NODE_ENV === 'production') {
+    delete error.stack;
   }
   logger.error(error);
-  res.status(status).json(error);
+  res.status(error.status).json({ error });
 };
