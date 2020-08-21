@@ -223,7 +223,7 @@ function isDirectory(source) {
 }
 
 async function writeSampleFile(filename: string, data: any) {
-  const folderPath = path.join(__dirname, '..', '..', 'sample');
+  const folderPath = path.join(__dirname, 'sample');
   await handleCreateFolder([folderPath]);
   await writeFile(path.join(folderPath, filename), prettyPrintJson(data));
 }
