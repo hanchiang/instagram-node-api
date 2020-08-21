@@ -26,7 +26,7 @@ export const errorHandler = (
 ) => {
   const error: any = {
     message: err.message || 'An error ocurred',
-    status: err.status,
+    status: err.status || 500,
     code: err.code,
     stack: err.stack,
   };
