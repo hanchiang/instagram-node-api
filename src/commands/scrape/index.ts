@@ -2,7 +2,6 @@ import path from 'path';
 import fs from 'fs';
 
 import axios from 'axios';
-import htmlparser from 'htmlparser2';
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 import {
@@ -10,33 +9,28 @@ import {
   readFile,
   writeFile,
   getOutputFilePath,
-  getInstagramGISHash,
-  getProfileMediaVariables,
-  httpHeaders,
   prettyPrintJson,
   sleep,
-  parseJson,
   randomInt,
 } from '../../utils';
 
 import { transformApiError } from '../../utils/error';
 
+import { USER_AGENT, NUM_TO_CALC_AVERAGE_ENGAGEMENT } from '../../constants';
+
+import { User } from '../../types/model';
+
 import {
-  USER_AGENT,
-  BASE_URL,
-  NUM_TO_CALC_AVERAGE_ENGAGEMENT,
-  MAX_MEDIA_PER_SCRAPE,
-  PROFILE_MEDIA_QUERY_HASH,
-  GRAPHQL_URL,
-  POST_URL,
-  VIRAL_THRESHOLD,
-  NUM_TO_SCRAPE,
-} from '../../constants';
-import UserViral from './model';
+  fetchProfile,
+  retrieveUserWebInfo,
+  _downloadPosts,
+  calculateEngagementRate,
+  getViralContent,
+} from '../../lib/insta';
+import { logger } from '../../utils/logging';
 
 const OUTPUT_FOLDER = 'output';
 const INPUT_FOLDER = 'input';
-const userViral = new UserViral();
 
 axios.defaults.headers.common['user-agent'] = USER_AGENT;
 
@@ -54,11 +48,8 @@ async function main() {
     const usernames = await readFile(inputfile);
 
     for (const username of usernames) {
-      userViral.init();
-      userViral.username = username.trim();
-
       const wait = randomInt(500, 1500);
-      await _scrapeUsers();
+      await _scrapeUser(username);
       console.log(`Sleeping for ${wait / 1000} second\n`);
       await sleep(wait);
     }
@@ -69,138 +60,82 @@ async function main() {
 }
 
 async function rescrapeAllUsers(directories) {
-  for (const directory of directories) {
-    userViral.init();
-    userViral.username = directory;
-    await _scrapeUsers();
+  for (const username of directories) {
+    await _scrapeUser(username);
   }
   console.log('All done!');
 }
 
-async function _scrapeUsers() {
-  if (userViral.username === '') {
+/**
+ * 1. Retrieve user profile page
+ * 2. Retrieve user shared data and web data under `window._sharedData` in the html source
+ * 3. Make requests to instagram API to get the media of a user
+ * 4. Calculate statistics(average likes, average comments of the latest 12 posts) of user
+ * 5. Filter media for viral posts
+ * 6. Save viral content to file
+ * Step 1 to 5 will be handled by `lib/insta.ts`
+ */
+async function _scrapeUser(username: string) {
+  if (username == null || username.length === 0) {
     return;
   }
   try {
     // 1. Retrieve profile page
-    console.log(`Retrieving profile url user: ${userViral.username}`);
-    const profileRes = await axios.get(`${BASE_URL}/${userViral.username}`);
+    logger.debug(`Retrieving profile url user: ${username}`);
+    const profileRes = (await fetchProfile(username)) as string;
 
-    // 2. Scrape `id` and `rhx_gis` from profile that is stored in 'window._sharedData' in the html source
-    console.log(`Retrieving info of user: ${userViral.username}`);
-    await retrieveUserWebInfo(profileRes.data);
+    // 2. Retrieve user shared data and web data under `window._sharedData` in the html source
+    logger.debug(`Retrieving info of user: ${username}`);
+    const {
+      userSharedData,
+      userWebData,
+      ...user
+    }: User = await retrieveUserWebInfo(profileRes);
 
-    if (userViral.isPrivate) {
-      console.log(`${userViral.username} is private. Skipping...`);
+    await writeSampleFile('user.txt', user);
+    // Under `window._sharedData` in profile page(View source)
+    await writeSampleFile('user_shared_data_sample.txt', userSharedData);
+    // User public account info
+    await writeSampleFile('user_web_data_sample.txt', userWebData);
+
+    logger.debug(
+      `@${user.username} has ${user.numPosts} posts, ${
+        user.numFollowers
+      } followers, ${user.numFollowing} following, is business account: ${
+        user.isBusinessAccount ? 'yes' : 'no'
+      }, country code: ${user.countryCode}, language code: ${
+        user.languageCode
+      }, locale: ${user.locale}`
+    );
+
+    if (user.isPrivate) {
+      console.log(`${user.username} is private. Skipping...`);
       return;
     }
-    if (userViral.numPosts < NUM_TO_CALC_AVERAGE_ENGAGEMENT) {
+    if (user.numPosts < NUM_TO_CALC_AVERAGE_ENGAGEMENT) {
       console.log(
-        `${userViral.username} has ${userViral.numPosts} posts, which is fewer than the required ${NUM_TO_CALC_AVERAGE_ENGAGEMENT} posts. Skipping...`
+        `${user.username} has ${user.numPosts} posts, which is fewer than the required ${NUM_TO_CALC_AVERAGE_ENGAGEMENT} posts. Skipping...`
       );
       return;
     }
 
-    console.log(`id: ${userViral.userId}\n`);
-
     // 3. Make graphql request to get media data of a profile and append to `posts`
-    await downloadPosts();
+    const posts = await downloadPosts(user);
 
     // 4. Calculate profile stats
-    calcProfileStats();
+    const { averageLikes, averageComments } = calculateEngagementRate(posts);
+    user.averageLikes = averageLikes;
+    user.averageComments = averageComments;
 
     // 5. Get viral content
-    getViralContent();
+    const viralPosts = getViralContent(posts, averageLikes);
 
     // 6. Save viral content to file
-    await saveViralContent();
+    await saveViralContent(user, viralPosts);
 
-    console.log(`Completed work for ${userViral.username}!`);
+    logger.debug(`Completed work for ${user.username}!`);
   } catch (err) {
     throw transformApiError(err);
-  }
-}
-
-/**
- * Adds post to list of posts
- * @param {array} edges
- */
-function appendPosts(edges) {
-  for (const edge of edges) {
-    const { node } = edge;
-    userViral.posts.push(node);
-  }
-}
-
-/**
- * Helps to parse window._sharedData to retrieve user's info
- * @param {string} data
- */
-function retrieveUserWebInfoHelper(data) {
-  return new Promise((resolve, reject) => {
-    let seenSharedData = false;
-
-    const parser = new htmlparser.Parser({
-      onopentag(name, attribs) {
-        // eslint-disable-next-line no-empty
-        if (name === 'script' && attribs.type === 'text/javascript') {
-        }
-      },
-      async ontext(text) {
-        const textToScan = 'window._sharedData = ';
-        if (text.substring(0, textToScan.length) === textToScan) {
-          const regex = /window\._sharedData = (.*);/;
-          const match = text.match(regex);
-          if (match) {
-            const json: any = await parseJson(match[1]);
-            seenSharedData = true;
-            userViral.userSharedData = json;
-            userViral.userWebData = json.entry_data.ProfilePage[0].graphql.user;
-
-            userViral.userId = userViral.userWebData.id;
-            (userViral.isPrivate = userViral.userWebData.is_private),
-              (userViral.numPosts =
-                userViral.userWebData.edge_owner_to_timeline_media.count);
-            userViral.numFollowers =
-              userViral.userWebData.edge_followed_by.count;
-            userViral.numFollowing = userViral.userWebData.edge_follow.count;
-            // Under `window._sharedData` in profile page(View source)
-            await writeFile(
-              'user_shared_data_sample.txt',
-              prettyPrintJson(json)
-            );
-            // User public account info
-            await writeFile(
-              'user_web_data_sample.txt',
-              prettyPrintJson(userViral.userWebData)
-            );
-            resolve();
-          } else {
-            reject("Oops! Unable to find user's web data");
-          }
-        }
-      },
-      onend() {
-        if (seenSharedData) {
-          reject('Not matched');
-        }
-      },
-    });
-    parser.write(data);
-    parser.end();
-  });
-}
-
-/**
- * Retrieve user's info from window._sharedData
- * @param {string} data
- */
-async function retrieveUserWebInfo(data) {
-  try {
-    await retrieveUserWebInfoHelper(data);
-  } catch (err) {
-    console.log(err);
-    throw new Error('Oops! Error occurred while retrieving user web info');
   }
 }
 
@@ -208,150 +143,38 @@ async function retrieveUserWebInfo(data) {
  *
  * @param {boolean} isVideo
  */
-function getSinglePostByType(isVideo = false) {
-  return userViral.posts.find((post) => isVideo === post.is_video);
+function getSinglePostByType(posts: any[], opt: any = {}) {
+  const { isVideo = false } = opt;
+
+  return posts.find((post) => isVideo === post.is_video);
 }
 
 /**
- * Instagram's graphql endpoint for getting user's media
- * @param {int} numMedia
- * @param {string} endCursor
+ * Retrieve and return user media
+ * Write sample results to file
+ * @param {User} user
  */
-async function getProfileMedia(numMedia, endCursor) {
-  const queryVariables = getProfileMediaVariables(
-    userViral.userId,
-    numMedia,
-    endCursor
+async function downloadPosts(user: User) {
+  const { allPosts, profileMediaResult } = await _downloadPosts(
+    user.id,
+    user.username
   );
-  const xInstagramGIS = getInstagramGISHash(queryVariables);
 
-  // https://www.instagram.com/graphql/query/?query_hash=${hash}&variables=${encoded JSON string variables}
-  const url = `${BASE_URL}/${GRAPHQL_URL}query_hash=${PROFILE_MEDIA_QUERY_HASH}&variables=${encodeURIComponent(
-    queryVariables
-  )}`;
-  const config = {
-    headers: httpHeaders(xInstagramGIS, userViral.username),
-  };
-  const res = await axios.get(url, config);
-  return res.data;
-}
+  await writeSampleFile('profile_media_sample.txt', profileMediaResult);
 
-async function downloadPosts() {
-  console.log(`Accessing media data of user: ${userViral.username}`);
-
-  let result = await getProfileMedia(MAX_MEDIA_PER_SCRAPE, '');
-  const posts = result.data.user.edge_owner_to_timeline_media;
-
-  let { page_info: pageInfo, edges } = posts;
-  userViral.currScrapeCount += edges.length;
-
-  appendPosts(edges);
-  console.log(`${userViral.username} has ${userViral.numPosts} posts!`);
-  console.log('Current scrape count:', userViral.currScrapeCount);
-
-  while (pageInfo.has_next_page && userViral.currScrapeCount < NUM_TO_SCRAPE) {
-    const wait = randomInt(100, 400);
-    console.log(`Sleeping for ${wait / 1000} seconds`);
-    await sleep(wait);
-
-    result = await getProfileMedia(MAX_MEDIA_PER_SCRAPE, pageInfo.end_cursor);
-    ({
-      page_info: pageInfo,
-      edges,
-    } = result.data.user.edge_owner_to_timeline_media);
-
-    userViral.currScrapeCount += edges.length;
-    appendPosts(edges);
-    console.log('Current scrape count:', userViral.currScrapeCount);
+  const imagePost = getSinglePostByType(allPosts);
+  if (imagePost) {
+    await writeSampleFile('image_post_sample.txt', imagePost);
   }
-  console.log(`Number of media scraped: ${userViral.currScrapeCount}\n`);
-  writeFile('profile_media_sample.txt', prettyPrintJson(result));
-  writeFile('image_post_sample.txt', prettyPrintJson(getSinglePostByType()));
-  writeFile(
-    'video_post_sample.txt',
-    prettyPrintJson(getSinglePostByType(true))
-  );
-}
-
-/**
- * Calculate average and median engagement of specified most recent posts
- */
-function calcProfileStats() {
-  let totalLikes = 0;
-  let totalComments = 0;
-  const likes = [];
-  const comments = [];
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < NUM_TO_CALC_AVERAGE_ENGAGEMENT; i++) {
-    totalLikes += userViral.posts[i].edge_media_preview_like.count;
-    totalComments += userViral.posts[i].edge_media_to_comment.count;
-    likes.push(userViral.posts[i].edge_media_preview_like.count);
-    comments.push(userViral.posts[i].edge_media_to_comment.count);
+  const videoPost = getSinglePostByType(allPosts, { isVideo: true });
+  if (videoPost) {
+    await writeSampleFile('video_post_sample.txt', videoPost);
   }
-  userViral.totalLikes = totalLikes;
-  userViral.totalComments = totalComments;
-  userViral.averageLikes = totalLikes / NUM_TO_CALC_AVERAGE_ENGAGEMENT;
-  userViral.averageComments = totalComments / NUM_TO_CALC_AVERAGE_ENGAGEMENT;
-
-  // get median
-  likes.sort((a, b) => a - b);
-  comments.sort((a, b) => a - b);
-  [userViral.medianLikes, userViral.medianComments] = [likes, comments].map(
-    (arr) => {
-      const len = arr.length;
-      if (len % 2 === 0) {
-        return (arr[len / 2 - 1] + arr[len / 2]) / 2;
-      }
-      return arr[len / 2];
-    }
-  );
-
-  console.log(`Statistics for ${userViral.username}.\nFollowers: ${userViral.numFollowers}. \
-  Following: ${userViral.numFollowing}. Average likes: ${userViral.averageLikes}, \
-  Average comments: ${userViral.averageComments}, Median likes: ${userViral.medianLikes}, \
-  Median comments: ${userViral.medianComments}`);
+  return allPosts;
 }
 
-/**
- * Filters posts to retrieve viral posts
- */
-function getViralContent() {
-  for (const post of userViral.posts) {
-    const viral = {
-      id: post.id,
-      userId: post.owner.id,
-      isVideo: post.is_video,
-      videoViews: post.video_view_count,
-      numComments: post.edge_media_to_comment.count,
-      numLikes: post.edge_media_preview_like.count,
-      url: `${POST_URL}/${post.shortcode}`,
-      mediaSource: post.is_video ? post.video_url : post.display_url,
-      captions: post.edge_media_to_caption.edges,
-      commentsDisabled: post.comments_disabled,
-      takenAt: post.taken_at_timestamp,
-      dimension: post.dimensions,
-      location: post.location,
-    };
-    if (post.is_video) {
-      viral.videoViews = post.video_view_count;
-    }
-    if (
-      post.edge_media_preview_like.count >
-      (1 + VIRAL_THRESHOLD) * userViral.medianLikes
-    ) {
-      userViral.viralPosts.push(viral);
-    }
-  }
-  userViral.viralPosts.sort((a, b) => b.numLikes - a.numLikes);
-  console.log(`Number of viral posts: ${userViral.viralPosts.length}\n`);
-}
-
-async function saveViralContent() {
-  await writeFile(
-    'viral_posts_sample.txt',
-    prettyPrintJson(userViral.viralPosts)
-  );
+async function saveViralContent(user: User, viralPosts: any[]) {
+  await writeSampleFile('viral_posts_sample.txt', viralPosts);
 
   const header = [
     { id: 'isVideo', title: 'Is video?' },
@@ -362,21 +185,21 @@ async function saveViralContent() {
   ];
 
   await handleCreateFolder([
-    path.join(__dirname, OUTPUT_FOLDER, userViral.username),
+    path.join(__dirname, OUTPUT_FOLDER, user.username),
   ]);
 
   const filename = getOutputFilePath(
-    userViral.numFollowers,
-    userViral.averageLikes,
-    userViral.averageComments
+    user.numFollowers,
+    user.averageLikes,
+    user.averageComments
   );
   const csvWriter = createCsvWriter({
-    path: path.join(__dirname, OUTPUT_FOLDER, userViral.username, filename),
+    path: path.join(__dirname, OUTPUT_FOLDER, user.username, filename),
     header,
   });
 
   return csvWriter
-    .writeRecords(userViral.viralPosts)
+    .writeRecords(viralPosts)
     .then(() => console.log(`Viral posts saved to file: ${filename}`))
     .catch((error) => console.log(error));
 }
@@ -397,6 +220,12 @@ function getDirectories(source) {
 
 function isDirectory(source) {
   return fs.statSync(source).isDirectory();
+}
+
+async function writeSampleFile(filename: string, data: any) {
+  const folderPath = path.join(__dirname, '..', '..', 'sample');
+  await handleCreateFolder([folderPath]);
+  await writeFile(path.join(folderPath, filename), prettyPrintJson(data));
 }
 
 module.exports = main;
