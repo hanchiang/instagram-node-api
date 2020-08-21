@@ -19,6 +19,8 @@ export interface User {
   countryCode: string;
   languageCode: string;
   locale: string;
+  userSharedData?: any;
+  userWebData?: any;
 }
 
 export interface ProfileStats {

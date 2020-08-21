@@ -51,12 +51,17 @@ export function writeFile(filepath: string, data: string) {
     });
 }
 
+/**
+ * @returns `${numFollowers}-${averageLikes}-${averageComments}-${today}.csv`
+ */
 export function getOutputFilePath(
   numFollowers: number,
   averageLikes: number,
   averageComments: number
 ) {
-  const follower = numeralNumberformat(numFollowers);
+  const follower = numeral(numFollowers).format(
+    numeralNumberformat(numFollowers)
+  );
   const likes = numeral(Math.round(averageLikes)).format(
     numeralNumberformat(averageLikes)
   );
@@ -66,7 +71,7 @@ export function getOutputFilePath(
   const now = moment().format(MOMENT_FORMAT);
 
   const format = `${follower}-${likes}-${comments}-${now}`;
-  return `${numeral(numFollowers).format(format)}.csv`;
+  return `${format}.csv`;
 }
 
 // eslint-disable-next-line consistent-return

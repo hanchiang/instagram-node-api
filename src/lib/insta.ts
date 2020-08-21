@@ -5,6 +5,7 @@ import { ApiResponse } from 'apisauce';
 import { User } from '../types/model';
 import { ProfileStats } from '../types/model';
 import { transformApiError } from '../utils/error';
+import { logger } from '../utils/logging';
 import Api from '../config';
 
 import {
@@ -25,6 +26,7 @@ import {
   MAX_MEDIA_PER_SCRAPE,
   NUM_TO_CALC_AVERAGE_ENGAGEMENT,
   VIRAL_THRESHOLD,
+  POST_URL,
 } from '../constants';
 
 /**
@@ -87,6 +89,9 @@ function retrieveUserWebInfoHelper(data: string): Promise<User> {
               countryCode: userSharedData.country_code,
               languageCode: userSharedData.language_code,
               locale: userSharedData.locale,
+              userSharedData,
+              userWebData:
+                userSharedData.entry_data.ProfilePage[0].graphql.user,
             };
             resolve(res);
           } else {
@@ -106,7 +111,7 @@ function retrieveUserWebInfoHelper(data: string): Promise<User> {
 }
 
 /**
- * Retrieve user's info from window._sharedData
+ * Retrieve user's info from `window._sharedData`
  * @param {string} data from fetchProfile
  */
 export async function retrieveUserWebInfo(data: string): Promise<User> {
@@ -159,8 +164,8 @@ export function appendPosts(allPosts: any[], edges: any[]): void {
 }
 
 /**
- *
- * @param {string} id
+ * Retrieve and return user media
+ * @param {string} userId
  * @param {string} username
  */
 // TODO: posts type
@@ -168,35 +173,7 @@ export async function downloadPosts(
   userId: string,
   username: string
 ): Promise<any[]> {
-  const allPosts: any[] = [];
-  let scrapeCount = 0;
-
-  let result = await getProfileMedia(MAX_MEDIA_PER_SCRAPE, userId, username);
-  const posts = result.data.user.edge_owner_to_timeline_media;
-
-  let { page_info: pageInfo, edges } = posts;
-
-  scrapeCount += edges.length;
-  appendPosts(allPosts, edges);
-
-  while (pageInfo.has_next_page && scrapeCount < NUM_TO_SCRAPE) {
-    const wait = randomInt(100, 400);
-    await sleep(wait);
-
-    result = await getProfileMedia(
-      MAX_MEDIA_PER_SCRAPE,
-      userId,
-      username,
-      pageInfo.end_cursor
-    );
-    ({
-      page_info: pageInfo,
-      edges,
-    } = result.data.user.edge_owner_to_timeline_media);
-
-    scrapeCount += edges.length;
-    appendPosts(allPosts, edges);
-  }
+  const { allPosts } = await _downloadPosts(userId, username);
 
   return allPosts.map((post: any) => {
     const resultPost = {
@@ -207,13 +184,58 @@ export async function downloadPosts(
   });
 }
 
+export async function _downloadPosts(userId, username) {
+  const allPosts: any[] = [];
+  let scrapeCount = 0;
+
+  logger.debug(`Accessing media data of user: ${username}`);
+  let profileMediaResult = await getProfileMedia(
+    MAX_MEDIA_PER_SCRAPE,
+    userId,
+    username
+  );
+  const posts = profileMediaResult.data.user.edge_owner_to_timeline_media;
+
+  let { page_info: pageInfo, edges } = posts;
+
+  appendPosts(allPosts, edges);
+  scrapeCount += edges.length;
+  logger.debug('Current scrape count:', scrapeCount);
+
+  while (pageInfo.has_next_page && scrapeCount < NUM_TO_SCRAPE) {
+    const wait = randomInt(100, 400);
+    logger.debug(`Sleeping for ${wait / 1000} seconds`);
+    await sleep(wait);
+
+    profileMediaResult = await getProfileMedia(
+      MAX_MEDIA_PER_SCRAPE,
+      userId,
+      username,
+      pageInfo.end_cursor
+    );
+    ({
+      page_info: pageInfo,
+      edges,
+    } = profileMediaResult.data.user.edge_owner_to_timeline_media);
+
+    scrapeCount += edges.length;
+    appendPosts(allPosts, edges);
+    logger.debug('Current scrape count:', scrapeCount);
+  }
+  logger.debug(`Number of media scraped: ${scrapeCount}`);
+  return {
+    allPosts,
+    profileMediaResult,
+  };
+}
+
 /**
  * Calculate average and median engagement of specified most recent posts
  * @param {array} posts
  * @return {ProfileStats}
  */
 // TODO: posts type
-export function calcProfileStats(posts: any[]): ProfileStats {
+export function calculateEngagementRate(posts: any[]): ProfileStats {
   let totalLikes = 0;
   let totalComments = 0;
   let averageLikes = 0;
@@ -227,17 +249,54 @@ export function calcProfileStats(posts: any[]): ProfileStats {
   averageLikes = totalLikes / NUM_TO_CALC_AVERAGE_ENGAGEMENT;
   averageComments = totalComments / NUM_TO_CALC_AVERAGE_ENGAGEMENT;
 
+  logger.debug(
+    `average likes: ${averageLikes}, average comments: ${averageComments}`
+  );
+
+  // TODO:
+  //   // get median
+  //   likes.sort((a, b) => a - b);
+  //   comments.sort((a, b) => a - b);
+  //   [userViral.medianLikes, userViral.medianComments] = [likes, comments].map(
+  //     (arr) => {
+  //       const len = arr.length;
+  //       if (len % 2 === 0) {
+  //         return (arr[len / 2 - 1] + arr[len / 2]) / 2;
+  //       }
+  //       return arr[len / 2];
+  //     }
+  //   );
+
   return {
     averageLikes,
     averageComments,
   };
 }
 
-export function getViralContent(averageLikes: number) {
-  // TODO: post type
-  return function (post: any): boolean {
+// TODO: post type
+export function getViralContent(allPosts: any[], averageLikes: number) {
+  const viralPosts = allPosts.filter((post: any): boolean => {
     return (
       post.edge_media_preview_like.count > (1 + VIRAL_THRESHOLD) * averageLikes
     );
-  };
+  });
+  logger.debug(`Number of viral posts: ${viralPosts.length}`);
+  return viralPosts.map((viralPost) => ({
+    // Refer to `utils/masks.txt`
+    id: viralPost.id,
+    userId: viralPost.owner.id,
+    isVideo: viralPost.is_video,
+    videoViews: viralPost.video_view_count,
+    numComments: viralPost.edge_media_to_comment.count,
+    numLikes: viralPost.edge_media_preview_like.count,
+    url: `${POST_URL}/${viralPost.shortcode}`,
+    mediaSource: viralPost.is_video
+      ? viralPost.video_url
+      : viralPost.display_url,
+    captions: viralPost.edge_media_to_caption.edges,
+    commentsDisabled: viralPost.comments_disabled,
+    takenAt: viralPost.taken_at_timestamp,
+    dimension: viralPost.dimensions,
+    location: viralPost.location,
+  }));
 }

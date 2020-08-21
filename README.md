@@ -1,3 +1,12 @@
+## Introduction
+
+This project contains an API server to retrieve viral posts from instagram users
+
+## Command line usage
+
+This project can also be used as a command line tool, i.e. run a command to retrieve data from instagram
+See [`commands/scrape`](commands/scrape/README.md)
+
 ## Features
 
 - If page is private, skip
@@ -28,13 +37,64 @@
 
 ## Usage
 
+- Clone project: `git clone https://github.com/hanchiang/instagram-node-api.git`
 - Install dependencies: `npm install`
-- Start server: `npm run dev`
+- Start server: `npm run debug`
 - Visit server at `localhost:3000`
 
-## Command line usage
+## Response
 
-See [`commands/scrape`](commands/scrape/README.md)
+**1. `/media/user/:username`**
+
+```javascript
+{
+  payload: {
+    id: "259220806",
+    username: "9gag",
+    fullname: "9GAG: Go Fun The World",
+    numPosts: 24040,
+    numFollowers: 53961371,
+    numFollowing: 29,
+    isPrivate: false,
+    isVerified: true,
+    profilePicUrl: "https://instagram.fsin9-1.fna.fbcdn.net/v/t51.2885-19/s150x150/18645376_238828349933616_4925847981183205376_a.jpg?_nc_ht=instagram.fsin9-1.fna.fbcdn.net&_nc_ohc=KlAJ_-uOHigAX9hExv2&oh=2b7f81bb509f4ffa69e3c0ea5b21d718&oe=5F6A4D82",
+    isBusinessAccount: true,
+    businessCategory: "Content & Apps",
+    businessEmail: "9gag@9gag.com",
+    csrfToken: "ZwCuuPOE4JvYQtodHS0IAxSLvyTHHozb",
+    countryCode: "SG",
+    languageCode: "en",
+    locale: "en_US",
+    averageLikes: 404667,
+    averageComments: 4926.65,
+    viralPosts: [
+      {
+        id: "2379768819261354837",
+        userId: "259220806",
+        isVideo: false,
+        numComments: 10633,
+        numLikes: 1006023,
+        url: "https://www.instagram.com/p/CEGoyHvn7NV",
+        mediaSource: "https://instagram.fsin9-1.fna.fbcdn.net/v/t51.2885-15/e15/118199425_121839406033441_1276973825853807065_n.jpg?_nc_ht=instagram.fsin9-1.fna.fbcdn.net&_nc_cat=1&_nc_ohc=rru33FOXNOkAX9f5eE7&oh=7b18d125b1ca084a5fe5648912b0d69f&oe=5F68D8E0",
+        captions: [
+        {
+        node: {
+        text: "Floofy ewok 📸 @kokoro_official - #fluff #toypoodle #9gag"
+        }
+        }
+        ],
+        commentsDisabled: false,
+        takenAt: 1597910571,
+        dimension: {
+        height: 640,
+        width: 640
+        },
+        location: null
+      }
+    ]
+  }
+}
+```
 
 ## Notes
 
@@ -53,12 +113,13 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [x] Migrate PostgreSQL to MySQL
 - [x] Migrate to Typescript
 - [x] Proper error handling
+- [x] Eliminate code duplication by adapting CLI code from `commands/scrape` to use code from `lib/insta.ts`
 - [ ] Improve code organisation
+- [ ] Add support for posts with multiple photo/video
 - [ ] Add more tests
-- [ ] Eliminate code duplication by adapting model in `commands/scrape/model.ts` to `insta.ts`
 - [ ] Update posts output format to become more human readable
-- [ ] Standardise data retrieved in `ontext()`
 - [ ] Add types for posts and other data
+- [ ] API documentation
 - [ ] Save posts to database?
 - [ ] Feature flag to toggle saving user and posts to database
 - [ ] Get followers list

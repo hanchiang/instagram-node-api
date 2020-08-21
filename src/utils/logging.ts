@@ -8,7 +8,7 @@ const logger = bunyan.createLogger({
     req: bunyan.stdSerializers.req,
     res: bunyan.stdSerializers.res,
   },
-  level: 'info',
+  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
 });
 
 // Disable logging when running tests
