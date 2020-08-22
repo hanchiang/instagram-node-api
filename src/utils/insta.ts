@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { BASE_URL } from '../constants';
 
 // referer is based on url path for some operations
-export function httpHeaders(xInstagramGIS: string, username: string) {
+export function instagramHttpHeaders(xInstagramGIS: string, username: string) {
   return {
     'x-instagram-gis': xInstagramGIS,
     referer: `${BASE_URL}/${username}/`,

@@ -12,7 +12,7 @@ import {
   parseJson,
   getProfileMediaVariables,
   getInstagramGISHash,
-  httpHeaders,
+  instagramHttpHeaders,
   randomInt,
   sleep,
   postMask,
@@ -141,7 +141,7 @@ export async function getProfileMedia(
     queryVariables
   )}`;
   const config = {
-    headers: httpHeaders(xInstagramGIS, username),
+    headers: instagramHttpHeaders(xInstagramGIS, username),
   };
   const res: ApiResponse<any> = await Api.get(`/${url}`, config);
   if (res.ok) {
