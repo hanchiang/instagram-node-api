@@ -1,11 +1,9 @@
-import { create } from 'apisauce';
+const config = {
+  nodeEnv: process.env.NODE_ENV || 'development',
+  dbName: process.env.DB_NAME || 'instagram',
+  dbUser: process.env.DB_USER,
+  dbPassword: process.env.DB_PASSWORD,
+  dbHost: process.env.DB_HOST || 'localhost',
+};
 
-import { BASE_URL, COMMON_HEADERS } from '../constants';
-
-const Api = create({
-  baseURL: BASE_URL,
-  timeout: 50000,
-  headers: COMMON_HEADERS,
-});
-
-export default Api;
+export default config;

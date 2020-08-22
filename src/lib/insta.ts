@@ -6,7 +6,7 @@ import { User } from '../types/model';
 import { ProfileStats } from '../types/model';
 import { transformApiError } from '../utils/error';
 import { logger } from '../utils/logging';
-import Api from '../config';
+import Api from './api';
 
 import {
   parseJson,
