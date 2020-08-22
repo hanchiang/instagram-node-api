@@ -2,6 +2,8 @@
 import { Sequelize } from 'sequelize';
 import cls from 'cls-hooked';
 
+import config from '../config';
+
 const namespace = cls.createNamespace('my-very-own-namespace');
 Sequelize.useCLS(namespace);
 
@@ -10,11 +12,11 @@ import { initPost, Post } from './models/post';
 export { User, Post };
 
 export const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
+  config.dbName,
+  config.dbUser,
+  config.dbPassword,
   {
-    host: process.env.DB_HOST,
+    host: config.dbHost,
     dialect: 'mysql',
   }
 );
