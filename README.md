@@ -117,7 +117,7 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [x] Migrate to Typescript
 - [x] Proper error handling
 - [x] Eliminate code duplication by adapting CLI code from `commands/scrape` to use code from `lib/insta.ts`
-- [ ] Improve code organisation
+- [x] Improve code organisation
 - [ ] Add support for posts with multiple photo/video
 - [ ] Add support to retrieve media from post URL, i.e. `instagram.com/p/<shortcode>`
 - [ ] Add more tests
