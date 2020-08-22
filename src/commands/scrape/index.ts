@@ -92,7 +92,6 @@ async function _scrapeUser(username: string) {
       ...user
     }: User = await retrieveUserWebInfo(profileRes);
 
-    await writeSampleFile('user.txt', user);
     // Under `window._sharedData` in profile page(View source)
     await writeSampleFile('user_shared_data_sample.txt', userSharedData);
     // User public account info
@@ -180,7 +179,7 @@ async function saveViralContent(user: User, viralPosts: any[]) {
     { id: 'isVideo', title: 'Is video?' },
     { id: 'numLikes', title: 'Likes' },
     { id: 'numComments', title: 'Comments' },
-    { id: 'url', title: 'Url' },
+    { id: 'url', title: 'Post URL' },
     { id: 'mediaSource', title: 'Media source' },
   ];
 
