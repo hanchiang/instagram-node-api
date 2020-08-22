@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { logger } from '../utils/logging';
 import { CustomError } from '../types/error';
+import config from '../config';
 
 export const catchErrors = (fn: Function) => (
   req: Request,
@@ -30,7 +31,7 @@ export const errorHandler = (
     code: err.code,
     stack: err.stack,
   };
-  if (process.env.NODE_ENV === 'production') {
+  if (config.nodeEnv === 'production') {
     delete error.stack;
   }
   logger.error(error);

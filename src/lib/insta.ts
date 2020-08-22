@@ -6,13 +6,13 @@ import { User } from '../types/model';
 import { ProfileStats } from '../types/model';
 import { transformApiError } from '../utils/error';
 import { logger } from '../utils/logging';
-import Api from '../config';
+import Api from './api';
 
 import {
   parseJson,
   getProfileMediaVariables,
   getInstagramGISHash,
-  httpHeaders,
+  instagramHttpHeaders,
   randomInt,
   sleep,
   postMask,
@@ -141,7 +141,7 @@ export async function getProfileMedia(
     queryVariables
   )}`;
   const config = {
-    headers: httpHeaders(xInstagramGIS, username),
+    headers: instagramHttpHeaders(xInstagramGIS, username),
   };
   const res: ApiResponse<any> = await Api.get(`/${url}`, config);
   if (res.ok) {

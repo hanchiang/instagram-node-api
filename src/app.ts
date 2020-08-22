@@ -1,3 +1,4 @@
+import { performance } from 'perf_hooks';
 import express from 'express';
 import morgan from 'morgan';
 import addRequestId from 'express-request-id';
@@ -60,13 +61,17 @@ app.use((req: any, res, next) => {
 
 // bunyan response log
 app.use((req, res, next) => {
+  const startMs = performance.now();
+
   function afterResponse() {
+    const endMs = performance.now();
     res.removeListener('finish', afterResponse);
     res.removeListener('close', afterResponse);
     const log = logger.child(
       {
         // @ts-ignore
         id: req.id,
+        msTaken: (endMs - startMs).toFixed(1),
       },
       true
     );

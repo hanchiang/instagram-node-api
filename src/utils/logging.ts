@@ -1,4 +1,6 @@
 import bunyan from 'bunyan';
+
+import config from '../config';
 const bunyanExpressSerializer = require('bunyan-express-serializer');
 
 const logger = bunyan.createLogger({
@@ -8,11 +10,11 @@ const logger = bunyan.createLogger({
     req: bunyan.stdSerializers.req,
     res: bunyan.stdSerializers.res,
   },
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  level: config.nodeEnv === 'production' ? 'info' : 'debug',
 });
 
 // Disable logging when running tests
-if (process.env.NODE_ENV === 'test') {
+if (config.nodeEnv === 'test') {
   logger.level(bunyan.FATAL + 1);
 }
 

@@ -7,7 +7,10 @@ This project contains an API server to retrieve viral posts from instagram users
 This project can also be used as a command line tool, i.e. run a command to retrieve data from instagram
 See [`commands/scrape`](commands/scrape/README.md)
 
-## Features
+## API features
+
+1. Retrieve viral posts from a user profile: `GET /media/user/:username`
+2. **TODO** Retrieve posts from a post URL `GET /media/post/:posturl`
 
 - If page is private, skip
 - If page has fewer than a certain number of posts, skip.
@@ -114,10 +117,10 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [x] Migrate to Typescript
 - [x] Proper error handling
 - [x] Eliminate code duplication by adapting CLI code from `commands/scrape` to use code from `lib/insta.ts`
-- [ ] Improve code organisation
+- [x] Improve code organisation
 - [ ] Add support for posts with multiple photo/video
+- [ ] Add support to retrieve media from post URL, i.e. `instagram.com/p/<shortcode>`
 - [ ] Add more tests
-- [ ] Update posts output format to become more human readable
 - [ ] Add types for posts and other data
 - [ ] API documentation
 - [ ] Save posts to database?

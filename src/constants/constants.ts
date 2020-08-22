@@ -1,4 +1,5 @@
 /* eslint-disable object-property-newline */
+import config from '../config';
 
 export const ENCODING = 'utf8';
 export const USER_AGENT =
@@ -22,7 +23,7 @@ export const QUERY_ID = '17888483320059182';
 
 // App constants
 export const VIRAL_THRESHOLD = 1;
-export const NUM_TO_SCRAPE = process.env.NODE_ENV === 'test' ? 100 : 500;
+export const NUM_TO_SCRAPE = config.nodeEnv === 'test' ? 100 : 500;
 export const NUM_TO_CALC_AVERAGE_ENGAGEMENT = 20;
 export const MIN_FOLLOWER = 15000;
 export const MIN_POSTS = 100;
