@@ -10,7 +10,10 @@ See [`commands/scrape`](commands/scrape/README.md)
 ## API features
 
 1. Retrieve viral posts from a user profile: `GET /media/user/:username`
-2. **TODO** Retrieve posts from a post URL `GET /media/post/:posturl`
+
+- 1. If instagram blocks(temporarily?) our IP because we sent too many requests in a short period of time,authenticate user and proceed
+
+1. **TODO** Retrieve posts from a post URL `GET /media/post/:posturl`
 
 - If page is private, skip
 - If page has fewer than a certain number of posts, skip.
@@ -32,11 +35,13 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 ### Environment variables
 
+- `NODE_ENV`: 'development' or 'test' or 'production'
 - `DB_NAME`
 - `DB_HOST`
 - `DB_USER`
 - `DB_PASSWORD`
-- `NODE_ENV`: 'development' or 'test' or 'production'
+- `INSTAGRAM_USER`
+- `INSTAGRAM_PASSWORD`
 
 ## Usage
 
@@ -118,6 +123,9 @@ See [`commands/scrape`](commands/scrape/README.md)
 - [x] Proper error handling
 - [x] Eliminate code duplication by adapting CLI code from `commands/scrape` to use code from `lib/insta.ts`
 - [x] Improve code organisation
+- [x] Add support for authentication. This is trigggered when instagram detects too many request coming from an unauthenticated user
+  - [] Improve/fix authentication
+  - [] Use proxies, rotate user agent
 - [ ] Add support for posts with multiple photo/video
 - [ ] Add support to retrieve media from post URL, i.e. `instagram.com/p/<shortcode>`
 - [ ] Add more tests

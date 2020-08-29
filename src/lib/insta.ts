@@ -1,9 +1,13 @@
+import querystring from 'querystring';
+
 import htmlparser from 'htmlparser2';
 import _ from 'lodash';
 import { ApiResponse } from 'apisauce';
 
 import { User } from '../types/model';
 import { ProfileStats } from '../types/model';
+import { UnauthCookie, AuthCookie } from '../types/insta';
+import { extractCookie } from '../utils';
 import { transformApiError } from '../utils/error';
 import { logger } from '../utils/logging';
 import Api from './api';
@@ -17,7 +21,10 @@ import {
   sleep,
   postMask,
   commentMask,
+  formatCookieString,
 } from '../utils';
+
+import { generateEncPassword } from '../utils/insta';
 
 import {
   NUM_TO_SCRAPE,
@@ -29,15 +36,159 @@ import {
   POST_URL,
 } from '../constants';
 
+async function getHome() {
+  const result = await Api.get('/', {
+    headers: {
+      referer: 'https://www.google.com',
+    },
+  });
+  if (result.ok) {
+    return result;
+  }
+  throw transformApiError(result);
+}
+
+export async function getUnauthenticatedCookies(): Promise<UnauthCookie> {
+  const { headers } = await getHome();
+  const cookieArray = headers['set-cookie'];
+
+  return extractCookie(cookieArray, ['ig_did', 'csrftoken', 'mid']);
+}
+
+/**
+ * Retrieve data like `rollout_hash`, `encryption`, `device_id`
+ */
+export async function getSharedData() {
+  const result = await Api.get('/data/shared_data/');
+  if (result.ok) {
+    return result.data;
+  }
+  throw transformApiError(result);
+}
+
+/**
+ * Log in a user, retrieve values in 'set-cookie' and 'x-ig-set-www-claim' header
+ * @param request
+ */
+export async function login(request): Promise<AuthCookie> {
+  const {
+    username,
+    password,
+    publicKeyId,
+    publicKey,
+    encryptionVersion,
+    cookieObj: unauthCookie,
+    rolloutHash,
+  }: {
+    username: string;
+    password: string;
+    publicKeyId: string;
+    publicKey: string;
+    encryptionVersion: string;
+    cookieObj: UnauthCookie;
+    rolloutHash: string;
+  } = request;
+
+  const params = {
+    username,
+    enc_password: generateEncPassword({
+      password,
+      publicKeyId,
+      publicKey,
+      encryptionVersion,
+    }),
+    queryParams: '{}',
+    optIntoOneTap: false,
+  };
+
+  logger.debug(`logging in @${username}`);
+
+  const result: any = await Api.post(
+    `/accounts/login/ajax/`,
+    querystring.stringify(params),
+    {
+      headers: {
+        'x-csrftoken': unauthCookie.csrftoken, // required
+        'x-instagram-ajax': rolloutHash, // required?
+        'x-ig-app-id': '936619743392459', // required?
+        'x-ig-www-claim': 0, // required?
+        'content-type': 'application/x-www-form-urlencoded',
+        accept: '*/*',
+        cookie: formatCookieString(unauthCookie), // required
+        referer: 'https://www.instagram.com/',
+        origin: 'https://www.instagram.com',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+      },
+    }
+  );
+
+  // Should return a non-zero value if login succeeds
+  const xIgWwwClaim = result.headers['x-ig-set-www-claim'];
+  if (result.ok) {
+    // data: { user: false, authenticated: false, status: 'ok' }
+    // data: { user: true, authenticated: false, status: 'ok' }
+    // TODO: hmmm.. unable to get authenticated: true. Something is missing
+    logger.info(result.data);
+    if (!result.data.authenticated) {
+      logger.warn(
+        `Login for @${username} succeeds but 'authenticated' is false`
+      );
+    }
+    const cookieArray = result.headers['set-cookie'];
+    const authCookie = extractCookie(cookieArray, ['sessionid', 'ds_user_id']);
+    const cookie: AuthCookie = {
+      ...unauthCookie,
+      ...authCookie,
+      'x-ig-www-claim': xIgWwwClaim,
+    };
+    logger.debug(cookie);
+    return cookie;
+  }
+  throw transformApiError(result);
+}
+
+/**
+ * Log in a user, use the credentials to fetch profile
+ * @param request
+ */
+export async function loginAndFetchProfile(request) {
+  const { username, password, encryption, cookieObj, rolloutHash } = request;
+  const {
+    key_id: publicKeyId,
+    public_key: publicKey,
+    version: encryptionVersion,
+  } = encryption;
+
+  const cookie: AuthCookie = await login({
+    username,
+    password,
+    publicKeyId,
+    publicKey,
+    encryptionVersion,
+    cookieObj,
+    rolloutHash,
+  });
+
+  const profileRes = await fetchProfile(username, {
+    cookie: formatCookieString(cookie),
+  });
+  return profileRes;
+}
+
 /**
  *
  * @param {string} username
  * @param {object} headers
  */
-export async function fetchProfile(username: string, headers: any = {}) {
+export async function fetchProfile(
+  username: string,
+  headers = {}
+): Promise<string> {
   const result = await Api.get(`/${username}`, { headers });
   if (result.ok) {
-    return result.data;
+    return result.data as string;
   }
   if (result.status === 404) {
     throw transformApiError(result, `@${username} is not found`);
@@ -203,7 +354,7 @@ export async function _downloadPosts(userId, username) {
   logger.debug('Current scrape count:', scrapeCount);
 
   while (pageInfo.has_next_page && scrapeCount < NUM_TO_SCRAPE) {
-    const wait = randomInt(100, 400);
+    const wait = randomInt(500, 1500);
     logger.debug(`Sleeping for ${wait / 1000} seconds`);
     await sleep(wait);
 

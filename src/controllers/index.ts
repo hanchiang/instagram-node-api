@@ -4,14 +4,21 @@ import {
   downloadPosts,
   calculateEngagementRate,
   getViralContent,
+  getSharedData,
+  loginAndFetchProfile,
+  getUnauthenticatedCookies,
 } from '../lib/insta';
 
 import { User } from '../types/model';
 import { throwError, ErrorStatus } from '../utils/error';
 
-import { NUM_TO_CALC_AVERAGE_ENGAGEMENT } from '../constants';
+import {
+  NUM_TO_CALC_AVERAGE_ENGAGEMENT,
+  REQUIRED_AUTH_MESSAGE,
+} from '../constants';
 import { upsertUser } from '../services';
 import { logger } from '../utils/logging';
+import config from '../config';
 
 /**
  * 1. Retrieve user profile page
@@ -23,9 +30,24 @@ import { logger } from '../utils/logging';
 export const getUserMedia = async (req, res) => {
   const { username } = req.params;
 
+  const sharedData: any = await getSharedData();
+  const unauthCookie = await getUnauthenticatedCookies();
+
   // 1. Retrieve user profile page
   logger.debug(`Retrieving profile url user: ${username}`);
-  const profileRes = (await fetchProfile(username)) as string;
+  let profileRes = await fetchProfile(username);
+
+  if (profileRes.indexOf(REQUIRED_AUTH_MESSAGE) !== -1) {
+    logger.info(`Instagram requires authentication in order to proceed`);
+
+    profileRes = await loginAndFetchProfile({
+      username: config.instagramUser,
+      password: config.instagramPassword,
+      encryption: sharedData.encryption,
+      rolloutHash: sharedData.rollout_hash,
+      cookieObj: unauthCookie,
+    });
+  }
 
   // 2. Retrieve user shared data and web data under `window._sharedData` in the html source
   logger.debug(`Retrieving info of user: ${username}`);
