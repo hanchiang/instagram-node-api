@@ -79,6 +79,14 @@ export async function login(request): Promise<AuthCookie> {
     encryptionVersion,
     cookieObj: unauthCookie,
     rolloutHash,
+  }: {
+    username: string;
+    password: string;
+    publicKeyId: string;
+    publicKey: string;
+    encryptionVersion: string;
+    cookieObj: UnauthCookie;
+    rolloutHash: string;
   } = request;
 
   const params = {
@@ -121,7 +129,7 @@ export async function login(request): Promise<AuthCookie> {
   if (result.ok) {
     // data: { user: false, authenticated: false, status: 'ok' }
     // data: { user: true, authenticated: false, status: 'ok' }
-    // TODO: hmmm.. unable to get authenticated: true
+    // TODO: hmmm.. unable to get authenticated: true. Something is missing
     logger.info(result.data);
     if (!result.data.authenticated) {
       logger.warn(
@@ -130,7 +138,7 @@ export async function login(request): Promise<AuthCookie> {
     }
     const cookieArray = result.headers['set-cookie'];
     const authCookie = extractCookie(cookieArray, ['sessionid', 'ds_user_id']);
-    const cookie = {
+    const cookie: AuthCookie = {
       ...unauthCookie,
       ...authCookie,
       'x-ig-www-claim': xIgWwwClaim,

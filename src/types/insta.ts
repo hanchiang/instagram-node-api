@@ -5,7 +5,8 @@ export interface UnauthCookie {
 }
 
 export interface AuthCookie extends UnauthCookie {
-  sessionid: string;
-  ds_user_id: string;
+  // TODO: Make mandatory
+  sessionid?: string;
+  ds_user_id?: string;
   'x-ig-www-claim'?: string;
 }
