@@ -124,8 +124,8 @@ See [`commands/scrape`](src/commands/scrape/README.md)
 - [x] Eliminate code duplication by adapting CLI code from `commands/scrape` to use code from `lib/insta.ts`
 - [x] Improve code organisation
 - [x] Add support for authentication. This is trigggered when instagram detects too many request coming from an unauthenticated user
-  - [] Improve/fix authentication
-  - [] Use proxies, rotate user agent
+  - [ ] Improve/fix authentication
+  - [ ] Use proxies, rotate user agent
 - [ ] Add support for posts with multiple photo/video
 - [ ] Add support to retrieve media from post URL, i.e. `instagram.com/p/<shortcode>`
 - [ ] Add more tests
