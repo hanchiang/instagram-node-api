@@ -425,6 +425,9 @@ export function calculateEngagementRate(posts: any[]): ProfileStats {
 }
 
 // TODO: post type
+/**
+ * Filter for viral posts, sort by number of likes, comments in descending order
+ */
 export function getViralContent(allPosts: any[], averageLikes: number) {
   const viralPosts = allPosts.filter((post: any): boolean => {
     return (
@@ -432,22 +435,33 @@ export function getViralContent(allPosts: any[], averageLikes: number) {
     );
   });
   logger.debug(`Number of viral posts: ${viralPosts.length}`);
-  return viralPosts.map((viralPost) => ({
+
+  return viralPosts.map(transformPost).sort(viralPostSorter);
+}
+
+function transformPost(post) {
+  return {
     // Refer to `utils/masks.txt`
-    id: viralPost.id,
-    userId: viralPost.owner.id,
-    isVideo: viralPost.is_video,
-    videoViews: viralPost.video_view_count,
-    numComments: viralPost.edge_media_to_comment.count,
-    numLikes: viralPost.edge_media_preview_like.count,
-    url: `${POST_URL}/${viralPost.shortcode}`,
-    mediaSource: viralPost.is_video
-      ? viralPost.video_url
-      : viralPost.display_url,
-    captions: viralPost.edge_media_to_caption.edges,
-    commentsDisabled: viralPost.comments_disabled,
-    takenAt: viralPost.taken_at_timestamp,
-    dimension: viralPost.dimensions,
-    location: viralPost.location,
-  }));
+    id: post.id,
+    userId: post.owner.id,
+    isVideo: post.is_video,
+    videoViews: post.video_view_count,
+    numComments: post.edge_media_to_comment.count,
+    numLikes: post.edge_media_preview_like.count,
+    url: `${POST_URL}/${post.shortcode}`,
+    mediaSource: post.is_video ? post.video_url : post.display_url,
+    captions: post.edge_media_to_caption.edges,
+    commentsDisabled: post.comments_disabled,
+    takenAt: post.taken_at_timestamp,
+    dimension: post.dimensions,
+    location: post.location,
+  };
+}
+
+function viralPostSorter(post1, post2): number {
+  if (post1.numLikes > post2.numLikes) return -1;
+  if (post1.numLikes < post2.numLikes) return 1;
+  if (post1.numComments > post2.numComments) return -1;
+  if (post1.numComments < post2.numComments) return 1;
+  return 0;
 }
