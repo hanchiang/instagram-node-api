@@ -5,7 +5,7 @@ This project contains an API server to retrieve viral posts from instagram users
 ## Command line usage
 
 This project can also be used as a command line tool, i.e. run a command to retrieve data from instagram
-See [`commands/scrape`](commands/scrape/README.md)
+See [`commands/scrape`](src/commands/scrape/README.md)
 
 ## API features
 
@@ -142,7 +142,6 @@ See [`commands/scrape`](commands/scrape/README.md)
 
 - [good node docker defaults - Bret fisher](https://github.com/BretFisher/node-docker-good-defaults) from docker guru Bret Fisher
 - [node docker setup - Digital ocean](https://www.digitalocean.com/community/tutorials/how-to-build-a-node-js-application-with-docker)
-- [Kubernetes nginx ingress](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes)
 - [Instagram developer changelog](https://www.instagram.com/developer/changelog/)
 
 ## Feedback
