@@ -3,12 +3,11 @@ import config from '../config';
 
 export const ENCODING = 'utf8';
 export const USER_AGENT =
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36';
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36';
 export const COMMON_HEADERS = {
   'accept-encoding': 'gzip, deflate, br',
   'accept-language': 'en-US,en;q=0.9',
   dnt: 1,
-  // referer: <path>
   'user-agent': USER_AGENT,
   'x-requested-with': 'XMLHttpRequest',
 };
@@ -34,3 +33,7 @@ export const PROFILE_MEDIA_QUERY_HASH = 'f2405b236d85e8296cf30347c9f08c2a';
 export const PROFILE_FOLLOWERS_QUERY_HASH = '7dd9a7e2160524fd85f50317462cff9f';
 export const PROFILE_FOLLOWING_QUERY_HASH = 'c56ee0ae1f89cdbd1c89e2bc6b8f3d18';
 export const MAX_MEDIA_PER_SCRAPE = 50;
+
+// Require authentication after visiting instagram too many times within a short period
+export const REQUIRED_AUTH_MESSAGE =
+  'Welcome back to Instagram. Sign in to check out what your friends, family &amp; interests have been capturing &amp; sharing around the world.';
