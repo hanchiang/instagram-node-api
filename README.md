@@ -85,17 +85,17 @@ See [`commands/scrape`](src/commands/scrape/README.md)
         url: "https://www.instagram.com/p/CEGoyHvn7NV",
         mediaSource: "https://instagram.fsin9-1.fna.fbcdn.net/v/t51.2885-15/e15/118199425_121839406033441_1276973825853807065_n.jpg?_nc_ht=instagram.fsin9-1.fna.fbcdn.net&_nc_cat=1&_nc_ohc=rru33FOXNOkAX9f5eE7&oh=7b18d125b1ca084a5fe5648912b0d69f&oe=5F68D8E0",
         captions: [
-        {
-        node: {
-        text: "Floofy ewok 📸 @kokoro_official - #fluff #toypoodle #9gag"
-        }
-        }
+          {
+            node: {
+              text: "Floofy ewok 📸 @kokoro_official - #fluff #toypoodle #9gag"
+            }
+          }
         ],
         commentsDisabled: false,
         takenAt: 1597910571,
         dimension: {
-        height: 640,
-        width: 640
+          height: 640,
+          width: 640
         },
         location: null
       }
