@@ -22,12 +22,11 @@ const statusToErrorCode = {
 export const mapStatusToErrorCode = (status: number): string =>
   statusToErrorCode[status] || statusToErrorCode[500];
 
-export const throwError = (errObj: ThrowError): CustomError => {
-  throw {
-    message: errObj.message,
-    code: mapStatusToErrorCode(errObj.status as number),
-    status: errObj.status as number,
-  };
+export const throwError = (errObj: ThrowError): void => {
+  const error: CustomError = new Error(errObj.message);
+  error.status = errObj.status as number;
+  error.code = mapStatusToErrorCode(errObj.status as number);
+  throw error;
 };
 
 export const transformApiError = (
