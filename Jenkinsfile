@@ -1,8 +1,5 @@
 pipeline {
-    agent any 
-    options {
-        skipStagesAfterUnstable()
-    }
+    agent { docker { image 'node:12.18' } }
     stages {
         stage('Build') { 
             steps {
