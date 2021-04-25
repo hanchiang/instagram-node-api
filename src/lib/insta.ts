@@ -125,7 +125,7 @@ export async function login(request): Promise<AuthCookie> {
     }
   );
 
-  // console.log(result);
+  console.log(result);
 
   // Should return a non-zero value if login succeeds
   const xIgWwwClaim = result.headers['x-ig-set-www-claim'];
@@ -223,6 +223,8 @@ function retrieveUserWebInfoHelper(data: string): Promise<User> {
             const userSharedData: any = await parseJson(match[1]);
             seenSharedData = true;
 
+            // TODO: hmm instagram has upped their bot protection game
+            // `userSharedData.entry_data` returns LoginAndSignupPage: [{ captcha }]
             const { user } = userSharedData.entry_data.ProfilePage[0].graphql;
 
             const res: User = {
