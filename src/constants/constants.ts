@@ -3,13 +3,12 @@ import config from '../config';
 
 export const ENCODING = 'utf8';
 export const USER_AGENT =
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36';
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36';
 export const COMMON_HEADERS = {
   'accept-encoding': 'gzip, deflate, br',
   'accept-language': 'en-US,en;q=0.9',
-  dnt: '1',
+  dnt: 1,
   'user-agent': USER_AGENT,
-  'x-requested-with': 'XMLHttpRequest',
 };
 
 export const MOMENT_FORMAT = 'YYYYMMDD-HH:mm:ss';
