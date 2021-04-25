@@ -37,17 +37,20 @@ export const getUserMedia = async (req, res) => {
   logger.debug(`Retrieving profile url user: ${username}`);
   let profileRes = await fetchProfile(username);
 
-  if (profileRes.indexOf(REQUIRED_AUTH_MESSAGE) !== -1) {
-    logger.info(`Instagram requires authentication in order to proceed`);
+  // if (profileRes.indexOf(REQUIRED_AUTH_MESSAGE) !== -1) {
+  logger.info(`Instagram requires authentication in order to proceed`);
 
-    profileRes = await loginAndFetchProfile({
-      username: config.instagramUser,
-      password: config.instagramPassword,
-      encryption: sharedData.encryption,
-      rolloutHash: sharedData.rollout_hash,
-      cookieObj: unauthCookie,
-    });
-  }
+  // TODO: Revisit some time in the future?
+  // profileRes = await loginAndFetchProfile({
+  //   username: config.instagramUser,
+  //   password: config.instagramPassword,
+  //   encryption: sharedData.encryption,
+  //   rolloutHash: sharedData.rollout_hash,
+  //   cookieObj: unauthCookie,
+  // });
+  // // }
+
+  // return res.json(profileRes);
 
   // 2. Retrieve user shared data and web data under `window._sharedData` in the html source
   logger.debug(`Retrieving info of user: ${username}`);

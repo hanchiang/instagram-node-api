@@ -52,7 +52,7 @@ export async function getUnauthenticatedCookies(): Promise<UnauthCookie> {
   const { headers } = await getHome();
   const cookieArray = headers['set-cookie'];
 
-  return extractCookie(cookieArray, ['ig_did', 'csrftoken', 'mid']);
+  return extractCookie(cookieArray, ['ig_did', 'csrftoken', 'mid', 'urlgen']);
 }
 
 /**
@@ -111,11 +111,12 @@ export async function login(request): Promise<AuthCookie> {
         'x-csrftoken': unauthCookie.csrftoken, // required
         'x-instagram-ajax': rolloutHash, // required?
         'x-ig-app-id': '936619743392459', // required?
-        'x-ig-www-claim': 0, // required?
+        'x-ig-www-claim': '0', // required?
         'content-type': 'application/x-www-form-urlencoded',
         accept: '*/*',
+        'accept-language': 'en-US',
         cookie: formatCookieString(unauthCookie), // required
-        referer: 'https://www.instagram.com/',
+        referer: 'https://www.instagram.com',
         origin: 'https://www.instagram.com',
         'sec-fetch-dest': 'empty',
         'sec-fetch-mode': 'cors',
@@ -124,11 +125,14 @@ export async function login(request): Promise<AuthCookie> {
     }
   );
 
+  // console.log(result);
+
   // Should return a non-zero value if login succeeds
   const xIgWwwClaim = result.headers['x-ig-set-www-claim'];
   if (result.ok) {
     // data: { user: false, authenticated: false, status: 'ok' }
     // data: { user: true, authenticated: false, status: 'ok' }
+    // data: {user": true, "userId": "7712856487", "authenticated": true, "oneTapPrompt": true, "status": "ok"}
     // TODO: hmmm.. unable to get authenticated: true. Something is missing
     logger.info(result.data);
     if (!result.data.authenticated) {
@@ -146,7 +150,7 @@ export async function login(request): Promise<AuthCookie> {
     logger.debug(cookie);
     return cookie;
   }
-  throw transformApiError(result);
+  throw transformApiError(result, result.data.message);
 }
 
 /**

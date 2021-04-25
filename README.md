@@ -40,8 +40,8 @@ See [`commands/scrape`](src/commands/scrape/README.md)
 - `DB_HOST`
 - `DB_USER`
 - `DB_PASSWORD`
-- `INSTAGRAM_USER`
-- `INSTAGRAM_PASSWORD`
+- `INSTAGRAM_USER`: _TBD_
+- `INSTAGRAM_PASSWORD`: _TBD_
 
 ## Usage
 

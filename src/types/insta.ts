@@ -2,6 +2,7 @@ export interface UnauthCookie {
   ig_did: string;
   csrftoken: string;
   mid: string;
+  urlgen: string;
 }
 
 export interface AuthCookie extends UnauthCookie {

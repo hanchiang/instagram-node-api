@@ -7,7 +7,7 @@ export const USER_AGENT =
 export const COMMON_HEADERS = {
   'accept-encoding': 'gzip, deflate, br',
   'accept-language': 'en-US,en;q=0.9',
-  dnt: 1,
+  dnt: '1',
   'user-agent': USER_AGENT,
   'x-requested-with': 'XMLHttpRequest',
 };
