@@ -38,7 +38,7 @@
     "express-request-id": "^1.4.1",
     "helmet": "^4.0.0",
     "htmlparser2": "^3.10.1",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "moment": "^2.27.0",
     "morgan": "^1.9.1",
     "mysql2": "^2.1.0",
