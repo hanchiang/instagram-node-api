@@ -39,7 +39,7 @@
     "helmet": "^4.0.0",
     "htmlparser2": "^3.10.1",
     "lodash": "^4.17.19",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "morgan": "^1.9.1",
     "mysql2": "^2.1.0",
     "numeral": "^2.0.6",
