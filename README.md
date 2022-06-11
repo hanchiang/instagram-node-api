@@ -1,11 +1,14 @@
 ## Introduction
 
-This project contains an API server to retrieve viral posts from instagram users
+This project contains an API service and CLI to retrieve viral posts from instagram users, and is part of the the [centralised repository](https://github.com/hanchiang/instagram-node-api-services) that contains the docker-compose set up files
 
 ## Command line usage
 
 This project can also be used as a command line tool, i.e. run a command to retrieve data from instagram
 See [`commands/scrape`](src/commands/scrape/README.md)
+
+## Architecture
+![](instagram-viral-posts-scraper.png)
 
 ## API features
 
@@ -19,7 +22,7 @@ See [`commands/scrape`](src/commands/scrape/README.md)
 - If page has fewer than a certain number of posts, skip.
 - Number of likes is used as the metric for extracting viral posts. Optionally, comments can be used also.
 
-**Configurable**
+**Configurable options**
 
 - `NUM_TO_SCRAPE`: Number of posts to scrape
 - `NUM_TO_CALC_AVERAGE_ENGAGEMENT`: Number to posts to use for calculating the median engagement rate of a user
@@ -32,6 +35,7 @@ See [`commands/scrape`](src/commands/scrape/README.md)
 1. Install [git](https://git-scm.com/downloads)
 1. Install [nodejs](https://nodejs.org/en/download/)
 1. Install [MySQL](https://www.mysql.com/)
+1. Use the docker-compose file from this[repository](https://github.com/hanchiang/instagram-node-api-services)
 
 ### Environment variables
 
